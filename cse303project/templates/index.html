@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Home - CSE303 DBMS Project{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="jumbotron bg-light p-5 rounded">
+                <div class="text-center">
+                    <h1 class="display-4">
+                        <i class="bi bi-database-fill text-primary"></i>
+                        Welcome to CSE303 Project
+                    </h1>
+                    <p class="lead">Database Management System Project</p>
+                    <hr class="my-4">
+                    <p>This is a comprehensive database management application built with Flask and Bootstrap.</p>
+
+                    {% if not current_user.is_authenticated %}
+                    <div class="mt-4">
+                        <a class="btn btn-primary btn-lg me-3" href="{{ url_for('register') }}" role="button">
+                            <i class="bi bi-person-plus"></i> Get Started
+                        </a>
+                        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('login') }}" role="button">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="mt-4">
+                        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">
+                            <i class="bi bi-speedometer2"></i> Go to Dashboard
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <h2 class="text-center mb-4">Project Features</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-lock display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">User Authentication</h5>
+                    <p class="card-text">Secure user registration and login system using Flask-Login with password hashing.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-database display-4 text-success mb-3"></i>
+                    <h5 class="card-title">Manual SQL Operations</h5>
+                    <p class="card-text">Direct SQL queries without ORM for better understanding of database operations.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-bootstrap display-4 text-warning mb-3"></i>
+                    <h5 class="card-title">Modern UI</h5>
+                    <p class="card-text">Responsive and modern user interface built with Bootstrap 5 framework.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="bi bi-gear"></i> Technology Stack</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <i class="bi bi-code-square display-4 text-danger"></i>
+                            <h5>Flask</h5>
+                            <p>Python Web Framework</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="bi bi-bootstrap display-4 text-primary"></i>
+                            <h5>Bootstrap</h5>
+                            <p>CSS Framework</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="bi bi-database display-4 text-success"></i>
+                            <h5>SQLite</h5>
+                            <p>Database Engine</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="bi bi-person-check display-4 text-warning"></i>
+                            <h5>Flask-Login</h5>
+                            <p>Authentication</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
