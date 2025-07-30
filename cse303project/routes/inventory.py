@@ -3,7 +3,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from ..database import (
     get_all_suppliers, add_supplier, get_supplier_by_id, update_supplier, delete_supplier,
-    get_all_products, add_product, get_product_by_id, update_product, delete_product
+    get_all_products, add_product, get_product_by_id, update_product, delete_product,
+    get_all_batches, add_batch, get_batch_by_id, update_batch, delete_batch
 )
 
 inventory_bp = Blueprint('inventory', __name__, template_folder='templates')
@@ -69,7 +70,7 @@ def add_product_route():
         storage_requirements = request.form['storage_requirements']
         shelf_life = request.form['shelf_life']
         packaging_details = request.form['packaging_details']
-        supplier_id = request.form['supplier_id']
+        supplier_.py
         add_product(name, animal_type, cut_type, processing_date, storage_requirements, shelf_life, packaging_details, supplier_id)
         flash('Product added successfully!', 'success')
         return redirect(url_for('inventory.list_products'))
@@ -103,3 +104,52 @@ def delete_product_route(id):
     delete_product(id)
     flash('Product deleted successfully!', 'success')
     return redirect(url_for('inventory.list_products'))
+
+# Batch Routes
+@inventory_bp.route('/batches')
+@login_required
+def list_batches():
+    batches = get_all_batches()
+    return render_template('inventory/list_batches.html', batches=batches)
+
+@inventory_bp.route('/batches/add', methods=['GET', 'POST'])
+@login_required
+def add_batch_route():
+    if request.method == 'POST':
+        product_id = request.form['product_id']
+        batch_number = request.form['batch_number']
+        quantity = request.form['quantity']
+        arrival_date = request.form['arrival_date']
+        expiration_date = request.form['expiration_date']
+        storage_location = request.form['storage_location']
+        add_batch(product_id, batch_number, quantity, arrival_date, expiration_date, storage_location)
+        flash('Batch added successfully!', 'success')
+        return redirect(url_for('inventory.list_batches'))
+
+    products = get_all_products()
+    return render_template('inventory/add_batch.html', products=products)
+
+@inventory_bp.route('/batches/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_batch(id):
+    batch = get_batch_by_id(id)
+    if request.method == 'POST':
+        product_id = request.form['product_id']
+        batch_number = request.form['batch_number']
+        quantity = request.form['quantity']
+        arrival_date = request.form['arrival_date']
+        expiration_date = request.form['expiration_date']
+        storage_location = request.form['storage_location']
+        update_batch(id, product_id, batch_number, quantity, arrival_date, expiration_date, storage_location)
+        flash('Batch updated successfully!', 'success')
+        return redirect(url_for('inventory.list_batches'))
+
+    products = get_all_products()
+    return render_template('inventory/edit_batch.html', batch=batch, products=products)
+
+@inventory_bp.route('/batches/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_batch_route(id):
+    delete_batch(id)
+    flash('Batch deleted successfully!', 'success')
+    return redirect(url_for('inventory.list_batches'))

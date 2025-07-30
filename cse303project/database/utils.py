@@ -58,6 +58,21 @@ def init_database():
             ''')
 
             cursor.execute('''
+                CREATE TABLE IF NOT EXISTS inventory_batches (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    product_id INT NOT NULL,
+                    batch_number VARCHAR(100),
+                    quantity DECIMAL(10, 2) NOT NULL,
+                    arrival_date DATE,
+                    expiration_date DATE,
+                    storage_location VARCHAR(100),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS activity_log (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT,
@@ -109,6 +124,21 @@ def init_database():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS inventory_batches (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id INTEGER NOT NULL,
+                    batch_number TEXT,
+                    quantity REAL NOT NULL,
+                    arrival_date DATE,
+                    expiration_date DATE,
+                    storage_location TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
                 )
             ''')
 

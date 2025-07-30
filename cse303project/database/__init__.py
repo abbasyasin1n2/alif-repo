@@ -24,6 +24,13 @@ from .product_queries import (
     update_product,
     delete_product
 )
+from .batch_queries import (
+    add_batch,
+    get_all_batches,
+    get_batch_by_id,
+    update_batch,
+    delete_batch
+)
 from .utils import (
     init_database,
     test_connection,
@@ -50,6 +57,11 @@ __all__ = [
     'get_product_by_id',
     'update_product',
     'delete_product',
+    'add_batch',
+    'get_all_batches',
+    'get_batch_by_id',
+    'update_batch',
+    'delete_batch',
     'init_database',
     'test_connection',
     'backup_database',

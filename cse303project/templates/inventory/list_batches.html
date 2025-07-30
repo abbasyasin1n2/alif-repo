@@ -1,0 +1,51 @@
+
+{% extends "base.html" %}
+
+{% block title %}Inventory Batches{% endblock %}
+
+{% block content %}
+<h2 class="header">Inventory Batches</h2>
+<a href="{{ url_for('inventory.add_batch_route') }}" class="btn-floating btn-large waves-effect waves-light right">
+    <i class="material-icons">add</i>
+</a>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Batch Number</th>
+            <th>Quantity</th>
+            <th>Arrival Date</th>
+            <th>Expiration Date</th>
+            <th>Storage Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for batch in batches %}
+        <tr>
+            <td>{{ batch.product_name }}</td>
+            <td>{{ batch.batch_number }}</td>
+            <td>{{ batch.quantity }}</td>
+            <td>{{ batch.arrival_date }}</td>
+            <td>{{ batch.expiration_date }}</td>
+            <td>{{ batch.storage_location }}</td>
+            <td>
+                <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light amber">
+                    <i class="material-icons">edit</i>
+                </a>
+                <form action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-small waves-effect waves-light red" onclick="return confirm('Are you sure?');">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="center-align">No inventory batches found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
