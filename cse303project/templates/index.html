@@ -19,16 +19,16 @@
 
                     {% if not current_user.is_authenticated %}
                     <div class="mt-4">
-                        <a class="btn btn-primary btn-lg me-3" href="{{ url_for('register') }}" role="button">
+                        <a class="btn btn-primary btn-lg me-3" href="{{ url_for('auth.register') }}" role="button">
                             <i class="bi bi-person-plus"></i> Get Started
                         </a>
-                        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('login') }}" role="button">
+                        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('auth.login') }}" role="button">
                             <i class="bi bi-box-arrow-in-right"></i> Login
                         </a>
                     </div>
                     {% else %}
                     <div class="mt-4">
-                        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">
+                        <a class="btn btn-primary btn-lg" href="{{ url_for('main.dashboard') }}" role="button">
                             <i class="bi bi-speedometer2"></i> Go to Dashboard
                         </a>
                     </div>
