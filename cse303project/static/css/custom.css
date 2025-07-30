@@ -1,84 +1,51 @@
-/* Custom CSS for CSE303 DBMS Project */
 
-/* Additional custom styles can be added here */
-.card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-color: #f4f6f8; /* Light Gray */
 }
 
-.btn-custom {
-    border-radius: 25px;
-    padding: 10px 25px;
+main {
+    flex: 1 0 auto;
 }
 
-.navbar-brand:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
+.brand-logo i {
+    vertical-align: middle;
+    margin-right: 10px;
 }
 
-.stats-card {
-    border-left: 4px solid;
-    border-radius: 0 0.375rem 0.375rem 0;
+.input-field label {
+    color: #00796b; /* Teal */
 }
 
-.stats-card.primary {
-    border-left-color: #0d6efd;
+.input-field input[type=text]:focus + label,
+.input-field input[type=email]:focus + label,
+.input-field input[type=password]:focus + label,
+.input-field textarea:focus + label {
+    color: #004d40; /* Dark Teal */
 }
 
-.stats-card.success {
-    border-left-color: #198754;
+.input-field input[type=text]:focus,
+.input-field input[type=email]:focus,
+.input-field input[type=password]:focus,
+.input-field textarea:focus {
+    border-bottom: 1px solid #004d40;
+    box-shadow: 0 1px 0 0 #004d40;
 }
 
-.stats-card.warning {
-    border-left-color: #ffc107;
+.btn, .btn-large, .btn-small {
+    background-color: #ffab40; /* Amber */
 }
 
-.stats-card.info {
-    border-left-color: #0dcaf0;
+.btn:hover, .btn-large:hover, .btn-small:hover {
+    background-color: #ffc400; /* Amber Accent */
 }
 
-/* Loading spinner */
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 2s linear infinite;
-    margin: 20px auto;
+.page-footer {
+    background-color: #263238; /* Blue Grey */
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Form enhancements */
-.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-/* Table styles */
-.table-custom {
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.table-custom thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-    font-weight: 600;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .display-4 {
-        font-size: 2rem;
-    }
-
-    .card-body {
-        padding: 1rem;
-    }
+.page-footer .footer-copyright {
+    background-color: #1a2327; /* Darker Blue Grey */
 }

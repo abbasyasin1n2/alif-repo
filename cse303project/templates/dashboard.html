@@ -1,162 +1,66 @@
+
 {% extends "base.html" %}
 
-{% block title %}Dashboard - CSE303 DBMS Project{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Welcome Section -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h2><i class="bi bi-speedometer2"></i> Welcome, {{ current_user.username }}!</h2>
-                    <p class="mb-0">Manage your data and explore the database features.</p>
-                </div>
+<h2 class="header">Dashboard</h2>
+<p class="flow-text">Welcome, {{ current_user.username }}!</p>
+
+<div class="row">
+    <div class="col s12 m6 l3">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Users</span>
+                <h3 class="center-align">{{ stats.total_users or 0 }}</h3>
+            </div>
+            <div class="card-action">
+                <a href="#">View Users</a>
             </div>
         </div>
     </div>
-
-    <!-- Statistics Cards -->
-    <div class="row mt-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="bi bi-people display-4 text-primary"></i>
-                    <h5 class="card-title mt-2">Users</h5>
-                    <h3 class="text-primary">0</h3>
-                    <p class="card-text">Total registered users</p>
-                </div>
+    <div class="col s12 m6 l3">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Products</span>
+                <h3 class="center-align">{{ stats.total_products or 0 }}</h3>
             </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="bi bi-file-earmark-text display-4 text-success"></i>
-                    <h5 class="card-title mt-2">Records</h5>
-                    <h3 class="text-success">0</h3>
-                    <p class="card-text">Total data records</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="bi bi-graph-up display-4 text-warning"></i>
-                    <h5 class="card-title mt-2">Analytics</h5>
-                    <h3 class="text-warning">0</h3>
-                    <p class="card-text">Data insights</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="bi bi-activity display-4 text-info"></i>
-                    <h5 class="card-title mt-2">Activity</h5>
-                    <h3 class="text-info">0</h3>
-                    <p class="card-text">Recent activities</p>
-                </div>
+            <div class="card-action">
+                <a href="{{ url_for('inventory.list_products') }}">View Products</a>
             </div>
         </div>
     </div>
-
-    <!-- Quick Actions -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-lightning"></i> Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <button class="btn btn-outline-primary w-100" onclick="alert('Feature coming soon!')">
-                                <i class="bi bi-plus-circle"></i><br>
-                                Add New Record
-                            </button>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <button class="btn btn-outline-success w-100" onclick="alert('Feature coming soon!')">
-                                <i class="bi bi-search"></i><br>
-                                Search Data
-                            </button>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <button class="btn btn-outline-warning w-100" onclick="alert('Feature coming soon!')">
-                                <i class="bi bi-bar-chart"></i><br>
-                                View Reports
-                            </button>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <button class="btn btn-outline-info w-100" onclick="alert('Feature coming soon!')">
-                                <i class="bi bi-gear"></i><br>
-                                Settings
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <div class="col s12 m6 l3">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Suppliers</span>
+                <h3 class="center-align">{{ stats.total_suppliers or 0 }}</h3>
+            </div>
+            <div class="card-action">
+                <a href="{{ url_for('inventory.list_suppliers') }}">View Suppliers</a>
             </div>
         </div>
     </div>
-
-    <!-- Recent Activity -->
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-clock-history"></i> Recent Activity</h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-inbox display-4"></i>
-                        <p class="mt-2">No recent activity to display</p>
-                        <small>Your recent actions will appear here</small>
-                    </div>
-                </div>
+    <div class="col s12 m6 l3">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Activity</span>
+                 <h3 class="center-align">0</h3>
+            </div>
+            <div class="card-action">
+                <a href="#">View Activity</a>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-person-circle"></i> Profile Info</h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-center">
-                        <i class="bi bi-person-circle display-4 text-primary"></i>
-                        <h6 class="mt-2">{{ current_user.username }}</h6>
-                        <p class="text-muted">{{ current_user.email }}</p>
-                        <button class="btn btn-sm btn-outline-primary" onclick="alert('Feature coming soon!')">
-                            <i class="bi bi-pencil"></i> Edit Profile
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Info -->
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6><i class="bi bi-info-circle"></i> System Info</h6>
-                </div>
-                <div class="card-body">
-                    <small class="text-muted">
-                        <div class="d-flex justify-content-between">
-                            <span>Database:</span>
-                            <span>SQLite</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Framework:</span>
-                            <span>Flask</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Frontend:</span>
-                            <span>Bootstrap 5</span>
-                        </div>
-                    </small>
-                </div>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Quick Actions</span>
+                <a href="{{ url_for('inventory.add_product_route') }}" class="btn-large waves-effect waves-light">Add Product</a>
+                <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn-large waves-effect waves-light">Add Supplier</a>
             </div>
         </div>
     </div>

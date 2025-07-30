@@ -73,11 +73,13 @@ def create_user(username, email, password_hash):
     )
 
 def get_user_stats():
-    """Get basic user statistics"""
+    """Get basic application statistics"""
     total_users = execute_query('SELECT COUNT(*) as count FROM users', fetch_one=True)
-    total_records = execute_query('SELECT COUNT(*) as count FROM sample_data', fetch_one=True)
+    total_products = execute_query('SELECT COUNT(*) as count FROM products', fetch_one=True)
+    total_suppliers = execute_query('SELECT COUNT(*) as count FROM suppliers', fetch_one=True)
 
     return {
         'total_users': total_users['count'] if total_users else 0,
-        'total_records': total_records['count'] if total_records else 0
+        'total_products': total_products['count'] if total_products else 0,
+        'total_suppliers': total_suppliers['count'] if total_suppliers else 0,
     }

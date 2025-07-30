@@ -1,125 +1,116 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CSE303 DBMS Project{% endblock %}</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
-    <!-- Custom CSS -->
-    <style>
-        .navbar-brand {
-            font-weight: bold;
-        }
-        .footer {
-            background-color: #f8f9fa;
-            padding: 20px 0;
-            margin-top: auto;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .main-content {
-            flex: 1;
-        }
-        .alert {
-            margin-bottom: 0;
-        }
-    </style>
-
-    {% block extra_css %}{% endblock %}
+    <title>{% block title %}Meat Inventory Management{% endblock %}</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-database"></i> CSE303 Project
-            </a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-                    </li>
+    <header>
+        <nav class="teal darken-2">
+            <div class="nav-wrapper container">
+                <a href="{{ url_for('main.index') }}" class="brand-logo">
+                    <i class="material-icons">store</i> Meat Inventory
+                </a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                    </li>
-                    {% endif %}
-                </ul>
-
-                <ul class="navbar-nav">
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                    <li><a class="dropdown-trigger" href="#!" data-target="inventory-dropdown">Inventory<i class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a class="dropdown-trigger" href="#!" data-target="user-dropdown">{{ current_user.username }}<i class="material-icons right">arrow_drop_down</i></a></li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                    </li>
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
                     {% endif %}
                 </ul>
             </div>
+        </nav>
+        
+        <ul id="inventory-dropdown" class="dropdown-content">
+            <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
+            <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
+        </ul>
+        
+        <ul id="user-dropdown" class="dropdown-content">
+            <li><a href="#">Profile</a></li>
+            <li class="divider"></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        </ul>
+
+        <ul class="sidenav" id="mobile-nav">
+            <li><a href="{{ url_for('main.index') }}">Home</a></li>
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
+            <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </header>
+
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <script>
+                            M.toast({html: '{{ message }}', classes: '{{ 'red' if category == 'error' else 'green' }}'});
+                        </script>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
         </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
-    <!-- Main Content -->
-    <main class="main-content">
-        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <footer class="page-footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 CSE303 Database Management Project</p>
+                <div class="col l6 s12">
+                    <h5 class="white-text">Meat Inventory Management</h5>
+                    <p class="grey-text text-lighten-4">A CSE303 Database Management Project.</p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <p class="mb-0">Built with Flask & Bootstrap</p>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="{{ url_for('main.index') }}">Home</a></li>
+                        {% if current_user.is_authenticated %}
+                        <li><a class="grey-text text-lighten-3" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                        {% else %}
+                        <li><a class="grey-text text-lighten-3" href="{{ url_for('auth.login') }}">Login</a></li>
+                        {% endif %}
+                    </ul>
                 </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2024 All Rights Reserved
+                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!--JavaScript at end of body for optimized loading-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.sidenav');
+            M.Sidenav.init(elems);
+            var dropdowns = document.querySelectorAll('.dropdown-trigger');
+            M.Dropdown.init(dropdowns);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

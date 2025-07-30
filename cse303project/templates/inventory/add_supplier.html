@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+
+{% block title %}Add Supplier{% endblock %}
+
+{% block content %}
+<h2 class="header">Add Supplier</h2>
+<div class="row">
+    <form class="col s12" action="{{ url_for('inventory.add_supplier_route') }}" method="post">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="name" type="text" name="name" class="validate" required>
+                <label for="name">Supplier Name</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s6">
+                <input id="contact_person" type="text" name="contact_person">
+                <label for="contact_person">Contact Person</label>
+            </div>
+            <div class="input-field col s6">
+                <input id="phone" type="tel" name="phone" class="validate">
+                <label for="phone">Phone</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="email" type="email" name="email" class="validate">
+                <label for="email">Email</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea id="address" name="address" class="materialize-textarea"></textarea>
+                <label for="address">Address</label>
+            </div>
+        </div>
+        <button type="submit" class="btn waves-effect waves-light">Add Supplier</button>
+        <a href="{{ url_for('inventory.list_suppliers') }}" class="btn waves-effect waves-light grey">Cancel</a>
+    </form>
+</div>
+{% endblock %}

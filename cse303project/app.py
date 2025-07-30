@@ -3,7 +3,7 @@ from flask import Flask
 from flask_login import LoginManager
 from .config.config import Config
 from .database import init_database, test_connection, get_user_by_id
-from .routes import auth_bp, main_bp
+from .routes import auth_bp, main_bp, inventory_bp
 from .models import User
 
 def create_app():
@@ -22,7 +22,8 @@ def create_app():
             return User(user_data['id'], user_data['username'], user_data['email'], user_data['password_hash'])
         return None
 
-    app.register_blueprint(auth_bp, url_prefix='/')
-    app.register_blueprint(main_bp, url_prefix='/')
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(inventory_bp, url_prefix='/inventory')
 
     return app

@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Supplier{% endblock %}
+
+{% block content %}
+<h2 class="header">Edit Supplier</h2>
+<div class="row">
+    <form class="col s12" action="{{ url_for('inventory.edit_supplier', id=supplier.id) }}" method="post">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="name" type="text" name="name" value="{{ supplier.name }}" class="validate" required>
+                <label for="name" class="active">Supplier Name</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s6">
+                <input id="contact_person" type="text" name="contact_person" value="{{ supplier.contact_person }}">
+                <label for="contact_person" class="active">Contact Person</label>
+            </div>
+            <div class="input-field col s6">
+                <input id="phone" type="tel" name="phone" value="{{ supplier.phone }}" class="validate">
+                <label for="phone" class="active">Phone</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="email" type="email" name="email" value="{{ supplier.email }}" class="validate">
+                <label for="email" class="active">Email</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea id="address" name="address" class="materialize-textarea">{{ supplier.address }}</textarea>
+                <label for="address" class="active">Address</label>
+            </div>
+        </div>
+        <button type="submit" class="btn waves-effect waves-light">Update Supplier</button>
+        <a href="{{ url_for('inventory.list_suppliers') }}" class="btn waves-effect waves-light grey">Cancel</a>
+    </form>
+</div>
+{% endblock %}
