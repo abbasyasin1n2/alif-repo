@@ -1,6 +1,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
+from decimal import Decimal
 from ..database import (
     get_all_processing_sessions, get_processing_session_by_id, add_processing_session,
     get_processing_inputs_for_session, add_processing_input,
@@ -22,7 +23,23 @@ def view_session(id):
     session = get_processing_session_by_id(id)
     inputs = get_processing_inputs_for_session(id)
     outputs = get_processing_outputs_for_session(id)
-    return render_template('processing/view_session.html', session=session, inputs=inputs, outputs=outputs)
+
+    total_input_weight = sum(i['quantity_used'] for i in inputs)
+    total_output_weight = sum(o['weight'] for o in outputs)
+    
+    yield_percentage = 0
+    if total_input_weight > 0:
+        yield_percentage = (total_output_weight / total_input_weight) * 100
+
+    return render_template(
+        'processing/view_session.html', 
+        session=session, 
+        inputs=inputs, 
+        outputs=outputs,
+        total_input_weight=total_input_weight,
+        total_output_weight=total_output_weight,
+        yield_percentage=yield_percentage
+    )
 
 @processing_bp.route('/sessions/add', methods=['GET', 'POST'])
 @login_required
@@ -41,7 +58,7 @@ def add_session():
 def add_input(id):
     if request.method == 'POST':
         batch_id = request.form['batch_id']
-        quantity_used = float(request.form['quantity_used'])
+        quantity_used = Decimal(request.form['quantity_used'])
         
         batch = get_batch_by_id(batch_id)
         if quantity_used > batch['quantity']:
@@ -60,10 +77,24 @@ def add_input(id):
 @processing_bp.route('/sessions/<int:id>/add_output', methods=['GET', 'POST'])
 @login_required
 def add_output(id):
+    inputs = get_processing_inputs_for_session(id)
+    if not inputs:
+        flash('Error: Cannot add an output before adding at least one input.', 'error')
+        return redirect(url_for('processing.view_session', id=id))
+
     if request.method == 'POST':
         product_id = request.form['product_id']
         output_type = request.form['output_type']
-        weight = request.form['weight']
+        weight = Decimal(request.form['weight'])
+
+        outputs = get_processing_outputs_for_session(id)
+        total_input_weight = sum(i['quantity_used'] for i in inputs)
+        total_output_weight = sum(o['weight'] for o in outputs)
+
+        if (total_output_weight + weight) > total_input_weight:
+            flash('Error: Total output weight cannot exceed total input weight.', 'error')
+            return redirect(url_for('processing.view_session', id=id))
+
         add_processing_output(id, product_id, output_type, weight)
         flash('Processing output added successfully!', 'success')
         return redirect(url_for('processing.view_session', id=id))

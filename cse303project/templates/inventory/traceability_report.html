@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+
+{% block title %}Traceability Report{% endblock %}
+
+{% block content %}
+<h2 class="header">Traceability Report</h2>
+
+<div class="card">
+    <div class="card-content">
+        <form method="POST">
+            <div class="input-field">
+                <select name="batch_id" id="batch_id">
+                    <option value="" disabled selected>Choose a batch</option>
+                    {% for batch in batches %}
+                        <option value="{{ batch.id }}">{{ batch.product_name }} - Batch #{{ batch.batch_number }}</option>
+                    {% endfor %}
+                </select>
+                <label>Select Batch to Trace</label>
+            </div>
+            <button class="btn waves-effect waves-light" type="submit">Generate Report</button>
+        </form>
+    </div>
+</div>
+
+{% if batch %}
+<div class="card">
+    <div class="card-content">
+        <span class="card-title">Traceability Details for Batch #{{ batch.batch_number }}</span>
+        
+        <div class="section">
+            <h5>Batch Information</h5>
+            <p><strong>Product:</strong> {{ product.name }}</p>
+            <p><strong>Arrival Date:</strong> {{ batch.arrival_date }}</p>
+            <p><strong>Expiration Date:</strong> {{ batch.expiration_date }}</p>
+            <p><strong>Initial Quantity:</strong> {{ batch.quantity + usage[0].inputs|sum(attribute='quantity_used') }}</p> {# A bit of a simplification #}
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <h5>Supplier Information</h5>
+            {% if supplier %}
+                <p><strong>Name:</strong> {{ supplier.name }}</p>
+                <p><strong>Contact:</strong> {{ supplier.contact_person }} ({{ supplier.email }})</p>
+            {% else %}
+                <p>No supplier information available.</p>
+            {% endif %}
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <h5>Processing History</h5>
+            {% if usage %}
+                {% for use in usage %}
+                <div class="card-panel">
+                    <h6>Used in Session: <a href="{{ url_for('processing.view_session', id=use.session.id) }}">{{ use.session.session_name }}</a> on {{ use.session.session_date }}</h6>
+                    <p><strong>Outputs from this session:</strong></p>
+                    <ul>
+                        {% for output in use.outputs %}
+                            <li>{{ output.product_name }} ({{ output.output_type }}) - {{ output.weight }} kg</li>
+                        {% else %}
+                            <li>No outputs recorded for this session.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>This batch has not been used in any processing sessions.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        M.FormSelect.init(elems);
+    });
+</script>
+{% endblock %}
