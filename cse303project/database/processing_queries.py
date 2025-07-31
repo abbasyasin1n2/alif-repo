@@ -21,6 +21,35 @@ def get_processing_session_by_id(session_id):
     query = 'SELECT * FROM processing_sessions WHERE id = %s' if DB_TYPE == 'mysql' else 'SELECT * FROM processing_sessions WHERE id = ?'
     return execute_query(query, (session_id,), fetch_one=True)
 
+def add_processing_input(session_id, batch_id, quantity_used):
+    """Add an input batch to a processing session"""
+    query = (
+        'INSERT INTO processing_inputs (session_id, batch_id, quantity_used) VALUES (%s, %s, %s)'
+        if DB_TYPE == 'mysql'
+        else 'INSERT INTO processing_inputs (session_id, batch_id, quantity_used) VALUES (?, ?, ?)'
+    )
+    params = (session_id, batch_id, quantity_used)
+    return execute_query(query, params)
+
+def get_processing_inputs_for_session(session_id):
+    """Get all input batches for a given processing session"""
+    query = '''
+        SELECT pi.*, b.batch_number, p.name as product_name
+        FROM processing_inputs pi
+        JOIN inventory_batches b ON pi.batch_id = b.id
+        JOIN products p ON b.product_id = p.id
+        WHERE pi.session_id = %s
+        ORDER BY pi.id
+    ''' if DB_TYPE == 'mysql' else '''
+        SELECT pi.*, b.batch_number, p.name as product_name
+        FROM processing_inputs pi
+        JOIN inventory_batches b ON pi.batch_id = b.id
+        JOIN products p ON b.product_id = p.id
+        WHERE pi.session_id = ?
+        ORDER BY pi.id
+    '''
+    return execute_query(query, (session_id,), fetch_all=True)
+
 def add_processing_output(session_id, product_id, output_type, weight):
     """Add an output product to a processing session"""
     query = (

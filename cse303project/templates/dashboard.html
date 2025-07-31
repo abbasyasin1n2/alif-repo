@@ -55,6 +55,40 @@
 </div>
 
 <div class="row">
+    <div class="col s12 m6">
+        <div class="card-panel red lighten-1">
+            <h5 class="white-text"><i class="material-icons left">warning</i>Expired Batches</h5>
+        </div>
+        <ul class="collection">
+            {% for batch in expired_batches %}
+                <li class="collection-item">
+                    {{ batch.product_name }} - Batch #{{ batch.batch_number }}
+                    <span class="right">Expired on: {{ batch.expiration_date }}</span>
+                </li>
+            {% else %}
+                <li class="collection-item">No expired batches.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col s12 m6">
+        <div class="card-panel amber lighten-1">
+            <h5 class="black-text"><i class="material-icons left">notification_important</i>Expiring Soon (Next 7 Days)</h5>
+        </div>
+        <ul class="collection">
+            {% for batch in soon_to_expire_batches %}
+                <li class="collection-item">
+                    {{ batch.product_name }} - Batch #{{ batch.batch_number }}
+                    <span class="right">Expires on: {{ batch.expiration_date }}</span>
+                </li>
+            {% else %}
+                <li class="collection-item">No batches expiring soon.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+<div class="row">
     <div class="col s12">
         <div class="card">
             <div class="card-content">

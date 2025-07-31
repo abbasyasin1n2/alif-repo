@@ -29,12 +29,17 @@ from .batch_queries import (
     get_all_batches,
     get_batch_by_id,
     update_batch,
-    delete_batch
+    update_batch_quantity,
+    delete_batch,
+    get_expired_batches,
+    get_soon_to_expire_batches
 )
 from .processing_queries import (
     add_processing_session,
     get_all_processing_sessions,
     get_processing_session_by_id,
+    add_processing_input,
+    get_processing_inputs_for_session,
     add_processing_output,
     get_processing_outputs_for_session
 )
@@ -68,10 +73,15 @@ __all__ = [
     'get_all_batches',
     'get_batch_by_id',
     'update_batch',
+    'update_batch_quantity',
     'delete_batch',
+    'get_expired_batches',
+    'get_soon_to_expire_batches',
     'add_processing_session',
     'get_all_processing_sessions',
     'get_processing_session_by_id',
+    'add_processing_input',
+    'get_processing_inputs_for_session',
     'add_processing_output',
     'get_processing_outputs_for_session',
     'init_database',

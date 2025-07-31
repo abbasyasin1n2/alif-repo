@@ -14,7 +14,7 @@
         <tr>
             <th>Product</th>
             <th>Batch Number</th>
-            <th>Quantity</th>
+            <th>Current Stock</th>
             <th>Arrival Date</th>
             <th>Expiration Date</th>
             <th>Storage Location</th>
@@ -26,7 +26,7 @@
         <tr>
             <td>{{ batch.product_name }}</td>
             <td>{{ batch.batch_number }}</td>
-            <td>{{ batch.quantity }}</td>
+            <td>{{ "%.2f"|format(batch.quantity) }}</td>
             <td>{{ batch.arrival_date }}</td>
             <td>{{ batch.expiration_date }}</td>
             <td>{{ batch.storage_location }}</td>
@@ -34,8 +34,8 @@
                 <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light amber">
                     <i class="material-icons">edit</i>
                 </a>
-                <form action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn-small waves-effect waves-light red" onclick="return confirm('Are you sure?');">
+                <form id="delete-form-{{ batch.id }}" action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" style="display:inline;">
+                    <button type="button" class="btn-small waves-effect waves-light red" onclick="confirmDelete('{{ batch.id }}')">
                         <i class="material-icons">delete</i>
                     </button>
                 </form>
@@ -48,4 +48,24 @@
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        })
+    }
+</script>
 {% endblock %}

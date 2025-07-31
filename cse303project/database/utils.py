@@ -84,6 +84,18 @@ def init_database():
             ''')
 
             cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_inputs (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    session_id INT NOT NULL,
+                    batch_id INT NOT NULL,
+                    quantity_used DECIMAL(10, 2) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (session_id) REFERENCES processing_sessions(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS processing_outputs (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     session_id INT NOT NULL,
@@ -174,6 +186,18 @@ def init_database():
                     notes TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_inputs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id INTEGER NOT NULL,
+                    batch_id INTEGER NOT NULL,
+                    quantity_used REAL NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (session_id) REFERENCES processing_sessions(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id) ON DELETE CASCADE
                 )
             ''')
 

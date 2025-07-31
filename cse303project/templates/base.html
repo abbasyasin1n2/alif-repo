@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
@@ -65,15 +67,6 @@
 
     <main>
         <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <script>
-                            M.toast({html: '{{ message }}', classes: '{{ 'red' if category == 'error' else 'green' }}'});
-                        </script>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
             {% block content %}{% endblock %}
         </div>
     </main>
@@ -108,12 +101,29 @@
 
     <!--JavaScript at end of body for optimized loading-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var elems = document.querySelectorAll('.sidenav');
             M.Sidenav.init(elems);
             var dropdowns = document.querySelectorAll('.dropdown-trigger');
             M.Dropdown.init(dropdowns);
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        Swal.fire({
+                            icon: '{{ category }}',
+                            title: '{{ message }}',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         });
     </script>
     {% block extra_js %}{% endblock %}

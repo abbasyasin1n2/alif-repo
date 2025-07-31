@@ -70,7 +70,7 @@ def add_product_route():
         storage_requirements = request.form['storage_requirements']
         shelf_life = request.form['shelf_life']
         packaging_details = request.form['packaging_details']
-        supplier_.py
+        supplier_id = request.form['supplier_id']
         add_product(name, animal_type, cut_type, processing_date, storage_requirements, shelf_life, packaging_details, supplier_id)
         flash('Product added successfully!', 'success')
         return redirect(url_for('inventory.list_products'))

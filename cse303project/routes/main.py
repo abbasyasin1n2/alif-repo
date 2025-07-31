@@ -1,7 +1,7 @@
 
 from flask import Blueprint, render_template
 from flask_login import login_required
-from ..database import get_user_stats
+from ..database import get_user_stats, get_expired_batches, get_soon_to_expire_batches
 
 main_bp = Blueprint('main', __name__, template_folder='templates')
 
@@ -13,4 +13,6 @@ def index():
 @login_required
 def dashboard():
     stats = get_user_stats()
-    return render_template('dashboard.html', stats=stats)
+    expired_batches = get_expired_batches()
+    soon_to_expire_batches = get_soon_to_expire_batches()
+    return render_template('dashboard.html', stats=stats, expired_batches=expired_batches, soon_to_expire_batches=soon_to_expire_batches)

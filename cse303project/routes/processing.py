@@ -3,7 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from ..database import (
     get_all_processing_sessions, get_processing_session_by_id, add_processing_session,
-    get_processing_outputs_for_session, add_processing_output, get_all_products
+    get_processing_inputs_for_session, add_processing_input,
+    get_processing_outputs_for_session, add_processing_output,
+    get_all_products, get_all_batches, get_batch_by_id, update_batch_quantity
 )
 
 processing_bp = Blueprint('processing', __name__, template_folder='templates')
@@ -18,8 +20,9 @@ def list_sessions():
 @login_required
 def view_session(id):
     session = get_processing_session_by_id(id)
+    inputs = get_processing_inputs_for_session(id)
     outputs = get_processing_outputs_for_session(id)
-    return render_template('processing/view_session.html', session=session, outputs=outputs)
+    return render_template('processing/view_session.html', session=session, inputs=inputs, outputs=outputs)
 
 @processing_bp.route('/sessions/add', methods=['GET', 'POST'])
 @login_required
@@ -32,6 +35,27 @@ def add_session():
         flash('Processing session added successfully!', 'success')
         return redirect(url_for('processing.list_sessions'))
     return render_template('processing/add_session.html')
+
+@processing_bp.route('/sessions/<int:id>/add_input', methods=['GET', 'POST'])
+@login_required
+def add_input(id):
+    if request.method == 'POST':
+        batch_id = request.form['batch_id']
+        quantity_used = float(request.form['quantity_used'])
+        
+        batch = get_batch_by_id(batch_id)
+        if quantity_used > batch['quantity']:
+            flash('Error: Quantity used cannot be greater than the available quantity in the batch.', 'error')
+            return redirect(url_for('processing.add_input', id=id))
+
+        add_processing_input(id, batch_id, quantity_used)
+        update_batch_quantity(batch_id, quantity_used)
+        
+        flash('Processing input added successfully!', 'success')
+        return redirect(url_for('processing.view_session', id=id))
+    
+    batches = get_all_batches()
+    return render_template('processing/add_input.html', session_id=id, batches=batches)
 
 @processing_bp.route('/sessions/<int:id>/add_output', methods=['GET', 'POST'])
 @login_required
