@@ -1,0 +1,40 @@
+
+{% extends "base.html" %}
+
+{% block title %}Processing Sessions{% endblock %}
+
+{% block content %}
+<h2 class="header">Processing Sessions</h2>
+<a href="{{ url_for('processing.add_session') }}" class="btn-floating btn-large waves-effect waves-light right">
+    <i class="material-icons">add</i>
+</a>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Session Name</th>
+            <th>Date</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in sessions %}
+        <tr>
+            <td>{{ session.session_name }}</td>
+            <td>{{ session.session_date }}</td>
+            <td>{{ session.notes }}</td>
+            <td>
+                <a href="{{ url_for('processing.view_session', id=session.id) }}" class="btn-small waves-effect waves-light">
+                    <i class="material-icons">visibility</i>
+                </a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" class="center-align">No processing sessions found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

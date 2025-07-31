@@ -24,6 +24,7 @@
                     {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
                     <li><a class="dropdown-trigger" href="#!" data-target="inventory-dropdown">Inventory<i class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a href="{{ url_for('processing.list_sessions') }}">Processing</a></li>
                     <li><a class="dropdown-trigger" href="#!" data-target="user-dropdown">{{ current_user.username }}<i class="material-icons right">arrow_drop_down</i></a></li>
                     {% else %}
                     <li><a href="{{ url_for('auth.login') }}">Login</a></li>
@@ -53,6 +54,7 @@
             <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
             <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
             <li><a href="{{ url_for('inventory.list_batches') }}">Batches</a></li>
+            <li><a href="{{ url_for('processing.list_sessions') }}">Processing</a></li>
             <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
             {% else %}
             <li><a href="{{ url_for('auth.login') }}">Login</a></li>

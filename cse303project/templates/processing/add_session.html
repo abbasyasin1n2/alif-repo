@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+
+{% block title %}Add Processing Session{% endblock %}
+
+{% block content %}
+<h2 class="header">Add Processing Session</h2>
+<div class="row">
+    <form class="col s12" action="{{ url_for('processing.add_session') }}" method="post">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="session_name" type="text" name="session_name" class="validate" required>
+                <label for="session_name">Session Name</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="session_date" type="text" name="session_date" class="datepicker">
+                <label for="session_date">Session Date</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea id="notes" name="notes" class="materialize-textarea"></textarea>
+                <label for="notes">Notes</label>
+            </div>
+        </div>
+        <button type="submit" class="btn waves-effect waves-light">Add Session</button>
+        <a href="{{ url_for('processing.list_sessions') }}" class="btn waves-effect waves-light grey">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var datepicker = document.querySelectorAll('.datepicker');
+        M.Datepicker.init(datepicker, {
+            format: 'yyyy-mm-dd'
+        });
+    });
+</script>
+{% endblock %}

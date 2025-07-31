@@ -1,0 +1,44 @@
+
+{% extends "base.html" %}
+
+{% block title %}View Processing Session{% endblock %}
+
+{% block content %}
+<h2 class="header">Session: {{ session.session_name }}</h2>
+<p><strong>Date:</strong> {{ session.session_date }}</p>
+<p><strong>Notes:</strong> {{ session.notes }}</p>
+
+<h3 class="header">Outputs</h3>
+<a href="{{ url_for('processing.add_output', id=session.id) }}" class="btn-floating btn-large waves-effect waves-light right">
+    <i class="material-icons">add</i>
+</a>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Output Type</th>
+            <th>Weight</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for output in outputs %}
+        <tr>
+            <td>{{ output.product_name }}</td>
+            <td>{{ output.output_type }}</td>
+            <td>{{ output.weight }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" class="center-align">No outputs found for this session.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="fixed-action-btn">
+    <a href="{{ url_for('processing.list_sessions') }}" class="btn-floating btn-large grey">
+        <i class="large material-icons">arrow_back</i>
+    </a>
+</div>
+{% endblock %}

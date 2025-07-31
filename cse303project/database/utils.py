@@ -73,6 +73,30 @@ def init_database():
             ''')
 
             cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_sessions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    session_name VARCHAR(100) NOT NULL,
+                    session_date DATE,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_outputs (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    session_id INT NOT NULL,
+                    product_id INT NOT NULL,
+                    output_type VARCHAR(50),
+                    weight DECIMAL(10, 2) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (session_id) REFERENCES processing_sessions(id) ON DELETE CASCADE,
+                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS activity_log (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT,
@@ -138,6 +162,30 @@ def init_database():
                     storage_location TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_name TEXT NOT NULL,
+                    session_date DATE,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS processing_outputs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id INTEGER NOT NULL,
+                    product_id INTEGER NOT NULL,
+                    output_type TEXT,
+                    weight REAL NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (session_id) REFERENCES processing_sessions(id) ON DELETE CASCADE,
                     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
                 )
             ''')
