@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Dashboard{% endblock %}
@@ -103,7 +102,7 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('load', function() {
         var pieChartData = JSON.parse('{{ pie_chart_data|safe }}');
         var pieOptions = {
             series: pieChartData.series,
@@ -129,6 +128,7 @@
         };
         var pieChart = new ApexCharts(document.querySelector("#animalTypeChart"), pieOptions);
         pieChart.render();
+        
         var lineChartData = JSON.parse('{{ line_chart_data|safe }}');
         var lineOptions = {
             series: [{
@@ -138,6 +138,7 @@
             chart: {
                 height: 350,
                 type: 'line',
+                width: '100%',
                 zoom: {
                     enabled: false
                 }
@@ -156,6 +157,15 @@
             },
             xaxis: {
                 categories: lineChartData.categories,
+                labels: {
+                    rotate: -45,
+                    rotateAlways: false,
+                    trim: true,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif'
+                    }
+                }
             }
         };
 
@@ -164,5 +174,3 @@
     });
 </script>
 {% endblock %}
-
-
