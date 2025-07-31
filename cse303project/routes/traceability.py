@@ -1,48 +1,57 @@
-
 from flask import Blueprint, render_template, request
 from flask_login import login_required
+import json
 from ..database import (
-    get_batch_by_id, 
-    get_processing_inputs_for_session, 
-    get_processing_outputs_for_session, 
-    get_product_by_id, 
+    get_batch_by_id,
+    get_processing_outputs_for_session,
+    get_product_by_id,
     get_supplier_by_id,
-    get_all_processing_sessions,
-    get_all_batches
+    get_all_batches,
+    get_processing_sessions_for_batch
 )
 
 traceability_bp = Blueprint('traceability', __name__, template_folder='templates')
 
-@traceability_bp.route('/traceability', methods=['GET', 'POST'])
+@traceability_bp.route('/report', methods=['GET', 'POST'])
 @login_required
 def traceability_report():
-    if request.method == 'POST':
-        batch_id = request.form.get('batch_id')
-        if batch_id:
-            batch = get_batch_by_id(batch_id)
-            product = get_product_by_id(batch['product_id'])
-            supplier = get_supplier_by_id(product['supplier_id']) if product else None
-            
-            # Find which processing session this batch was used in
-            # This is a simplified approach. A real-world app might need a more complex query.
-            all_sessions = get_all_processing_sessions()
-            usage = []
-            for session in all_sessions:
-                inputs = get_processing_inputs_for_session(session['id'])
-                for input_batch in inputs:
-                    if input_batch['batch_id'] == int(batch_id):
-                        outputs = get_processing_outputs_for_session(session['id'])
-                        usage.append({'session': session, 'outputs': outputs, 'inputs': inputs})
-
-            batches = get_all_batches()
-            return render_template(
-                'inventory/traceability_report.html',
-                batch=batch,
-                product=product,
-                supplier=supplier,
-                usage=usage,
-                batches=batches
-            )
+    selected_batch_id = request.form.get('batch_id') if request.method == 'POST' else request.args.get('batch_id')
     
-    batches = get_all_batches()
-    return render_template('inventory/traceability_report.html', batches=batches)
+    batch = None
+    product = None
+    supplier = None
+    usage_details = []
+
+    if selected_batch_id:
+        batch = get_batch_by_id(selected_batch_id)
+        if batch:
+            product = get_product_by_id(batch['product_id'])
+            if product and product['supplier_id']:
+                supplier = get_supplier_by_id(product['supplier_id'])
+            
+            # Use the new efficient query
+            sessions = get_processing_sessions_for_batch(selected_batch_id)
+            for session in sessions:
+                outputs = get_processing_outputs_for_session(session['id'])
+                
+                # Prepare data for the donut chart
+                chart_labels = [o['output_type'] for o in outputs]
+                chart_series = [float(o['weight']) for o in outputs]
+                chart_data = json.dumps({'labels': chart_labels, 'series': chart_series})
+
+                usage_details.append({
+                    'session': session,
+                    'outputs': outputs,
+                    'chart_data': chart_data
+                })
+
+    all_batches = get_all_batches()
+    return render_template(
+        'inventory/traceability_report.html',
+        batches=all_batches,
+        selected_batch_id=int(selected_batch_id) if selected_batch_id else None,
+        batch=batch,
+        product=product,
+        supplier=supplier,
+        usage_details=usage_details
+    )

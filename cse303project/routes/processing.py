@@ -1,4 +1,3 @@
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from decimal import Decimal
@@ -23,6 +22,10 @@ def view_session(id):
     session = get_processing_session_by_id(id)
     inputs = get_processing_inputs_for_session(id)
     outputs = get_processing_outputs_for_session(id)
+    
+    # Data for modals
+    all_products = get_all_products()
+    available_batches = get_all_batches()
 
     total_input_weight = sum(i['quantity_used'] for i in inputs)
     total_output_weight = sum(o['weight'] for o in outputs)
@@ -38,7 +41,9 @@ def view_session(id):
         outputs=outputs,
         total_input_weight=total_input_weight,
         total_output_weight=total_output_weight,
-        yield_percentage=yield_percentage
+        yield_percentage=yield_percentage,
+        all_products=all_products,
+        available_batches=available_batches
     )
 
 @processing_bp.route('/sessions/add', methods=['GET', 'POST'])
@@ -53,28 +58,29 @@ def add_session():
         return redirect(url_for('processing.list_sessions'))
     return render_template('processing/add_session.html')
 
-@processing_bp.route('/sessions/<int:id>/add_input', methods=['GET', 'POST'])
+@processing_bp.route('/sessions/<int:id>/add_input', methods=['POST'])
 @login_required
 def add_input(id):
-    if request.method == 'POST':
-        batch_id = request.form['batch_id']
-        quantity_used = Decimal(request.form['quantity_used'])
-        
-        batch = get_batch_by_id(batch_id)
-        if quantity_used > batch['quantity']:
-            flash('Error: Quantity used cannot be greater than the available quantity in the batch.', 'error')
-            return redirect(url_for('processing.add_input', id=id))
-
-        add_processing_input(id, batch_id, quantity_used)
-        update_batch_quantity(batch_id, quantity_used)
-        
-        flash('Processing input added successfully!', 'success')
-        return redirect(url_for('processing.view_session', id=id))
+    batch_id = request.form['batch_id']
+    quantity_used = Decimal(request.form['quantity_used'])
     
-    batches = get_all_batches()
-    return render_template('processing/add_input.html', session_id=id, batches=batches)
+    batch = get_batch_by_id(batch_id)
+    if quantity_used <= 0:
+        flash('Error: Quantity used must be a positive number.', 'error')
+        return redirect(url_for('processing.view_session', id=id))
 
-@processing_bp.route('/sessions/<int:id>/add_output', methods=['GET', 'POST'])
+    if quantity_used > batch['quantity']:
+        flash(f"Error: Quantity used ({quantity_used}) cannot be greater than the available quantity in the batch ({batch['quantity']}).", 'error')
+        return redirect(url_for('processing.view_session', id=id))
+
+    add_processing_input(id, batch_id, quantity_used)
+    # The quantity to deduct is the positive value of quantity_used
+    update_batch_quantity(batch_id, -abs(quantity_used))
+    
+    flash('Processing input added successfully!', 'success')
+    return redirect(url_for('processing.view_session', id=id))
+
+@processing_bp.route('/sessions/<int:id>/add_output', methods=['POST'])
 @login_required
 def add_output(id):
     inputs = get_processing_inputs_for_session(id)
@@ -82,22 +88,22 @@ def add_output(id):
         flash('Error: Cannot add an output before adding at least one input.', 'error')
         return redirect(url_for('processing.view_session', id=id))
 
-    if request.method == 'POST':
-        product_id = request.form['product_id']
-        output_type = request.form['output_type']
-        weight = Decimal(request.form['weight'])
+    product_id = request.form['product_id']
+    output_type = request.form['output_type']
+    weight = Decimal(request.form['weight'])
 
-        outputs = get_processing_outputs_for_session(id)
-        total_input_weight = sum(i['quantity_used'] for i in inputs)
-        total_output_weight = sum(o['weight'] for o in outputs)
-
-        if (total_output_weight + weight) > total_input_weight:
-            flash('Error: Total output weight cannot exceed total input weight.', 'error')
-            return redirect(url_for('processing.view_session', id=id))
-
-        add_processing_output(id, product_id, output_type, weight)
-        flash('Processing output added successfully!', 'success')
+    if weight <= 0:
+        flash('Error: Weight must be a positive number.', 'error')
         return redirect(url_for('processing.view_session', id=id))
-    
-    products = get_all_products()
-    return render_template('processing/add_output.html', session_id=id, products=products)
+
+    outputs = get_processing_outputs_for_session(id)
+    total_input_weight = sum(i['quantity_used'] for i in inputs)
+    total_output_weight = sum(o['weight'] for o in outputs)
+
+    if (total_output_weight + weight) > total_input_weight:
+        flash(f"Error: Total output weight ({total_output_weight + weight}) cannot exceed total input weight ({total_input_weight}).", 'error')
+        return redirect(url_for('processing.view_session', id=id))
+
+    add_processing_output(id, product_id, output_type, weight)
+    flash('Processing output added successfully!', 'success')
+    return redirect(url_for('processing.view_session', id=id))

@@ -1,81 +1,162 @@
-
 {% extends "base.html" %}
 
 {% block title %}Traceability Report{% endblock %}
 
 {% block content %}
 <div class="animate__animated animate__fadeIn">
-    <h2 class="header">Traceability Report</h2>
+    <div class="dashboard-header">
+        <h2>Traceability Report</h2>
+        <p>Follow a batch from supplier to processing outputs.</p>
+    </div>
 
-    <div class="card-panel-new">
-        <form method="POST" class="trace-form">
-            <div class="input-field">
-                <select name="batch_id" id="batch_id">
-                    <option value="" disabled selected>Choose a batch to trace</option>
-                    {% for b in batches %}
-                        <option value="{{ b.id }}" {% if batch and b.id == batch.id %}selected{% endif %}>
-                            {{ b.product_name }} - Batch #{{ b.batch_number }}
+    <!-- Batch Selector Card -->
+    <div class="content-card">
+        <form method="POST" action="{{ url_for('traceability.traceability_report') }}">
+            <div class="row" style="margin-bottom: 0;">
+                <div class="input-field col s10">
+                    <i class="ti ti-search prefix"></i>
+                    <select name="batch_id" id="batch_id">
+                        <option value="" disabled {% if not selected_batch_id %}selected{% endif %}>Choose a batch to trace</option>
+                        {% for b in batches %}
+                        <option value="{{ b.id }}" {% if selected_batch_id == b.id %}selected{% endif %}>
+                            #{{ b.batch_number }} - {{ b.product_name }}
                         </option>
-                    {% endfor %}
-                </select>
-                <label>Select Batch</label>
+                        {% endfor %}
+                    </select>
+                    <label>Select Batch</label>
+                </div>
+                <div class="input-field col s2">
+                    <button class="btn waves-effect waves-light action-btn w-100" type="submit">Trace</button>
+                </div>
             </div>
-            <button class="btn waves-effect waves-light action-btn" type="submit"><i class="ti ti-search left"></i>Generate Report</button>
         </form>
     </div>
 
     {% if batch %}
-    <div class="card-panel-new animate__animated animate__fadeInUp">
-        <span class="card-title"><h4>Traceability Details for Batch #{{ batch.batch_number }}</h4></span>
-        
+    <!-- Batch Details Card -->
+    <div class="content-card animate__animated animate__fadeInUp">
+        <div class="card-title-with-icon">
+            <h5><i class="ti ti-box-seam" style="margin-right: 10px;"></i>Batch #{{ batch.batch_number }} Details</h5>
+        </div>
         <div class="row">
-            <div class="col s12 m6">
-                <h5><i class="ti ti-box-seam"></i> Batch Information</h5>
-                <p><strong>Product:</strong> {{ product.name }}</p>
+            <div class="col s12 m6 l4">
+                <h6>Product Information</h6>
+                <p><strong>Name:</strong> {{ product.name }}</p>
+                <p><strong>Animal/Cut:</strong> {{ product.animal_type }} / {{ product.cut_type }}</p>
+            </div>
+            <div class="col s12 m6 l4">
+                <h6>Batch Information</h6>
                 <p><strong>Arrival Date:</strong> {{ batch.arrival_date }}</p>
                 <p><strong>Expiration Date:</strong> {{ batch.expiration_date }}</p>
             </div>
-            <div class="col s12 m6">
-                <h5><i class="ti ti-truck-delivery"></i> Supplier Information</h5>
+            <div class="col s12 m6 l4">
+                <h6><i class="ti ti-truck-delivery" style="margin-right: 10px;"></i>Supplier</h6>
                 {% if supplier %}
-                    <p><strong>Name:</strong> {{ supplier.name }}</p>
-                    <p><strong>Contact:</strong> {{ supplier.contact_person }} ({{ supplier.email }})</p>
+                <p><strong>Name:</strong> {{ supplier.name }}</p>
+                <p><strong>Contact:</strong> {{ supplier.contact_person }}</p>
                 {% else %}
-                    <p>No supplier information available.</p>
+                <p>No supplier information available.</p>
                 {% endif %}
             </div>
         </div>
-
-        <div class="divider" style="margin: 20px 0;"></div>
-
-        <h5><i class="ti ti-settings-cog"></i> Processing History</h5>
-        {% if usage %}
-            {% for use in usage %}
-            <div class="card-panel-new-nested">
-                <h6><i class="ti ti-arrow-right"></i> Used in Session: <a href="{{ url_for('processing.view_session', id=use.session.id) }}">{{ use.session.session_name }}</a> on {{ use.session.session_date }}</h6>
-                <p><strong>Outputs from this session:</strong></p>
-                <ul class="browser-default">
-                    {% for output in use.outputs %}
-                        <li>{{ output.product_name }} ({{ output.output_type }}) - {{ output.weight }} kg</li>
-                    {% else %}
-                        <li>No outputs recorded for this session.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p>This batch has not been used in any processing sessions.</p>
-        {% endif %}
     </div>
+
+    <!-- Processing History -->
+    <div class="dashboard-header" style="margin-top: 30px;">
+        <h4>Processing History</h4>
+    </div>
+
+    {% if usage_details %}
+        {% for usage in usage_details %}
+        <div class="content-card animate__animated animate__fadeInUp">
+             <div class="card-title-with-icon">
+                <h5><i class="ti ti-settings-cog" style="margin-right: 10px;"></i>Session: <a href="{{ url_for('processing.view_session', id=usage.session.id) }}">{{ usage.session.session_name }}</a></h5>
+                <span>{{ usage.session.session_date }}</span>
+            </div>
+            <div class="row">
+                <div class="col s12 m7">
+                    <h6>Outputs from this Session</h6>
+                    <div class="responsive-table">
+                        <table class="highlight">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Output Type</th>
+                                    <th class="right-align">Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for output in usage.outputs %}
+                                <tr>
+                                    <td>{{ output.product_name }}</td>
+                                    <td>{{ output.output_type }}</td>
+                                    <td class="right-align">{{ "%.2f"|format(output.weight) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col s12 m5">
+                    <h6 class="center-align">Output Distribution by Weight</h6>
+                    <div id="outputChart{{ loop.index }}"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="content-card center-align">
+            <p>This batch has not been used in any processing sessions.</p>
+        </div>
+    {% endif %}
+
     {% endif %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var elems = document.querySelectorAll('select');
-        M.FormSelect.init(elems);
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select
+    var selectElems = document.querySelectorAll('select');
+    M.FormSelect.init(selectElems);
+
+    // Initialize Charts for each session
+    {% if usage_details %}
+        {% for usage in usage_details %}
+            var chartData{{ loop.index }} = JSON.parse('{{ usage.chart_data|safe }}');
+            var options{{ loop.index }} = {
+                series: chartData{{ loop.index }}.series,
+                chart: {
+                    type: 'donut',
+                    height: 250
+                },
+                labels: chartData{{ loop.index }}.labels,
+                legend: {
+                    position: 'bottom'
+                },
+                dataLabels: {
+                    dropShadow: {
+                        enabled: false
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var chart{{ loop.index }} = new ApexCharts(document.querySelector("#outputChart{{ loop.index }}"), options{{ loop.index }});
+            chart{{ loop.index }}.render();
+        {% endfor %}
+    {% endif %}
+});
 </script>
 {% endblock %}

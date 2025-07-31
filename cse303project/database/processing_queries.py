@@ -1,4 +1,3 @@
-
 from .user_queries import execute_query
 from .connection import DB_TYPE
 
@@ -76,3 +75,20 @@ def get_processing_outputs_for_session(session_id):
         ORDER BY po.id
     '''
     return execute_query(query, (session_id,), fetch_all=True)
+
+def get_processing_sessions_for_batch(batch_id):
+    """Get all processing sessions where a specific batch was used as an input."""
+    query = '''
+        SELECT DISTINCT ps.*
+        FROM processing_sessions ps
+        JOIN processing_inputs pi ON ps.id = pi.session_id
+        WHERE pi.batch_id = %s
+        ORDER BY ps.session_date DESC
+    ''' if DB_TYPE == 'mysql' else '''
+        SELECT DISTINCT ps.*
+        FROM processing_sessions ps
+        JOIN processing_inputs pi ON ps.id = pi.session_id
+        WHERE pi.batch_id = ?
+        ORDER BY ps.session_date DESC
+    '''
+    return execute_query(query, (batch_id,), fetch_all=True)

@@ -5,86 +5,164 @@
 
 {% block content %}
 <div class="animate__animated animate__fadeIn">
-    <h2 class="header">Dashboard</h2>
-    <p class="flow-text">Welcome, {{ current_user.username }}!</p>
-</div>
+    <div class="dashboard-header">
+        <h2>Dashboard</h2>
+        <p>Welcome, {{ current_user.username }}!</p>
+    </div>
 
-<div class="row">
-    <div class="col s12 m6 l3">
-        <div class="summary-card animate__animated animate__fadeInUp">
-            <div class="card-icon"><i class="ti ti-users"></i></div>
-            <div class="card-content">
-                <p class="category">Total Users</p>
-                <h4 class="title">{{ stats.total_users or 0 }}</h4>
+    <div class="row">
+        <div class="col s12 m6 l3">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="ti ti-users"></i></div>
+                <div class="stat-info">
+                    <div class="stat-title">Total Users</div>
+                    <div class="stat-value">{{ stats.total_users or 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="ti ti-box"></i></div>
+                <div class="stat-info">
+                    <div class="stat-title">Total Products</div>
+                    <div class="stat-value">{{ stats.total_products or 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="ti ti-truck-delivery"></i></div>
+                <div class="stat-info">
+                    <div class="stat-title">Total Suppliers</div>
+                    <div class="stat-value">{{ stats.total_suppliers or 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="ti ti-activity"></i></div>
+                <div class="stat-info">
+                    <div class="stat-title">Recent Activity</div>
+                    <div class="stat-value">0</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col s12 m6 l3">
-        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
-            <div class="card-icon"><i class="ti ti-box"></i></div>
-            <div class="card-content">
-                <p class="category">Total Products</p>
-                <h4 class="title">{{ stats.total_products or 0 }}</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col s12 m6 l3">
-        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
-            <div class="card-icon"><i class="ti ti-truck-delivery"></i></div>
-            <div class="card-content">
-                <p class="category">Total Suppliers</p>
-                <h4 class="title">{{ stats.total_suppliers or 0 }}</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col s12 m6 l3">
-        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
-            <div class="card-icon"><i class="ti ti-activity"></i></div>
-            <div class="card-content">
-                <p class="category">Recent Activity</p>
-                <h4 class="title">0</h4>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col s12 m6">
-        <div class="card-panel-new red animate__animated animate__fadeInLeft">
-            <h5><i class="ti ti-alert-triangle left"></i>Expired Batches</h5>
-            <div class="collection">
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="alert-card red">
+                <div class="alert-title"><i class="ti ti-alert-triangle"></i>Expired Batches</div>
                 {% for batch in expired_batches %}
-                    <a href="#!" class="collection-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }} <span class="right">{{ batch.expiration_date }}</span></a>
+                    <div class="alert-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }}</div>
                 {% else %}
-                    <a href="#!" class="collection-item">No expired batches.</a>
+                    <div class="alert-item">No expired batches.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <div class="alert-card orange">
+                <div class="alert-title"><i class="ti ti-bell-ringing"></i>Expiring Soon (7 Days)</div>
+                 {% for batch in soon_to_expire_batches %}
+                    <div class="alert-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }}</div>
+                {% else %}
+                    <div class="alert-item">No batches expiring soon.</div>
                 {% endfor %}
             </div>
         </div>
     </div>
-    <div class="col s12 m6">
-        <div class="card-panel-new orange animate__animated animate__fadeInRight">
-            <h5><i class="ti ti-bell-ringing left"></i>Expiring Soon (7 Days)</h5>
-            <div class="collection">
-                {% for batch in soon_to_expire_batches %}
-                     <a href="#!" class="collection-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }} <span class="right">{{ batch.expiration_date }}</span></a>
-                {% else %}
-                    <a href="#!" class="collection-item">No batches expiring soon.</a>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col s12">
-        <div class="card-panel-new-actions animate__animated animate__fadeInUp">
-            <span class="card-title">Quick Actions</span>
-            <div class="actions-container">
-                <a href="{{ url_for('inventory.add_product_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Product</a>
-                <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Supplier</a>
-                <a href="{{ url_for('inventory.add_batch_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Batch</a>
+    <div class="row">
+        <div class="col s12">
+            <div class="content-card">
+                <div class="card-title">Quick Actions</div>
+                <a href="{{ url_for('inventory.add_product_route') }}" class="btn action-btn"><i class="ti ti-plus left"></i>Add Product</a>
+                <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn action-btn"><i class="ti ti-plus left"></i>Add Supplier</a>
+                <a href="{{ url_for('inventory.add_batch_route') }}" class="btn action-btn"><i class="ti ti-plus left"></i>Add Batch</a>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="content-card">
+                <div class="card-title">Products by Animal Type</div>
+                <div id="animalTypeChart"></div>
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <div class="content-card">
+                <div class="card-title">Inventory Over Time</div>
+                <div id="inventoryTimeChart"></div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var pieChartData = JSON.parse('{{ pie_chart_data|safe }}');
+        var pieOptions = {
+            series: pieChartData.series,
+            chart: {
+                type: 'pie',
+                height: 350
+            },
+            labels: pieChartData.labels,
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        var pieChart = new ApexCharts(document.querySelector("#animalTypeChart"), pieOptions);
+        pieChart.render();
+        var lineChartData = JSON.parse('{{ line_chart_data|safe }}');
+        var lineOptions = {
+            series: [{
+                name: "Quantity",
+                data: lineChartData.series
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'],
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: lineChartData.categories,
+            }
+        };
+
+        var lineChart = new ApexCharts(document.querySelector("#inventoryTimeChart"), lineOptions);
+        lineChart.render();
+    });
+</script>
+{% endblock %}
+
+

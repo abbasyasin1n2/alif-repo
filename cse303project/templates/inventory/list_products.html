@@ -7,7 +7,7 @@
 <div class="animate__animated animate__fadeIn">
     <div class="row">
         <div class="col s12">
-            <div class="card-panel-new">
+            <div class="content-card">
                 <div class="card-title-with-button">
                     <h4>Products</h4>
                     <a href="{{ url_for('inventory.add_product_route') }}" class="btn waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Product</a>
@@ -33,9 +33,9 @@
                                 <td>{{ product.processing_date }}</td>
                                 <td>{{ product.supplier_name or 'N/A' }}</td>
                                 <td>
-                                    <a href="{{ url_for('inventory.edit_product', id=product.id) }}" class="btn-small waves-effect waves-light amber"><i class="ti ti-edit"></i></a>
+                                    <a href="{{ url_for('inventory.edit_product', id=product.id) }}" class="btn-small waves-effect waves-light btn-edit"><i class="ti ti-edit"></i></a>
                                     <form id="delete-form-{{ product.id }}" action="{{ url_for('inventory.delete_product_route', id=product.id) }}" method="post" style="display:inline;">
-                                        <button type="button" class="btn-small waves-effect waves-light red" onclick="confirmDelete('{{ product.id }}')"><i class="ti ti-trash"></i></button>
+                                        <button type="button" class="btn-small waves-effect waves-light btn-warning" onclick="confirmDelete('{{ product.id }}')"><i class="ti ti-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>

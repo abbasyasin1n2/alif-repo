@@ -7,7 +7,7 @@
 <div class="animate__animated animate__fadeIn">
     <div class="row">
         <div class="col s12">
-            <div class="card-panel-new">
+            <div class="content-card">
                 <div class="card-title-with-button">
                     <h4>Inventory Batches</h4>
                     <a href="{{ url_for('inventory.add_batch_route') }}" class="btn waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Batch</a>
@@ -35,9 +35,9 @@
                                 <td>{{ batch.expiration_date }}</td>
                                 <td>{{ batch.storage_location }}</td>
                                 <td>
-                                    <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light amber"><i class="ti ti-edit"></i></a>
+                                    <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light btn-edit"><i class="ti ti-edit"></i></a>
                                     <form id="delete-form-{{ batch.id }}" action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" style="display:inline;">
-                                        <button type="button" class="btn-small waves-effect waves-light red" onclick="confirmDelete('{{ batch.id }}')"><i class="ti ti-trash"></i></button>
+                                        <button type="button" class="btn-small waves-effect waves-light btn-warning" onclick="confirmDelete('{{ batch.id }}')"><i class="ti ti-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>

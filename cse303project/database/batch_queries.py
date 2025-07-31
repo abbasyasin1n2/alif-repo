@@ -86,3 +86,13 @@ def get_soon_to_expire_batches(days=7):
     """.format(days)
     params = (days,) if DB_TYPE == 'mysql' else ()
     return execute_query(query, params, fetch_all=True)
+
+def get_inventory_over_time():
+    """Get the sum of inventory quantities grouped by arrival date"""
+    query = """
+        SELECT arrival_date, SUM(quantity) as total_quantity
+        FROM inventory_batches
+        GROUP BY arrival_date
+        ORDER BY arrival_date ASC
+    """
+    return execute_query(query, fetch_all=True)

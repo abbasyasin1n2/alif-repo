@@ -41,3 +41,13 @@ def delete_product(product_id):
     """Delete a product"""
     query = 'DELETE FROM products WHERE id = %s' if DB_TYPE == 'mysql' else 'DELETE FROM products WHERE id = ?'
     return execute_query(query, (product_id,))
+
+def get_product_counts_by_animal_type():
+    """Get the count of products for each animal type"""
+    query = """
+        SELECT animal_type, COUNT(id) as product_count
+        FROM products
+        GROUP BY animal_type
+        ORDER BY product_count DESC
+    """
+    return execute_query(query, fetch_all=True)

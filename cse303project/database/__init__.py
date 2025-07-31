@@ -1,4 +1,3 @@
-
 from .connection import get_db_connection
 from .user_queries import (
     get_user_by_id,
@@ -22,7 +21,8 @@ from .product_queries import (
     get_all_products,
     get_product_by_id,
     update_product,
-    delete_product
+    delete_product,
+    get_product_counts_by_animal_type
 )
 from .batch_queries import (
     add_batch,
@@ -32,7 +32,8 @@ from .batch_queries import (
     update_batch_quantity,
     delete_batch,
     get_expired_batches,
-    get_soon_to_expire_batches
+    get_soon_to_expire_batches,
+    get_inventory_over_time
 )
 from .processing_queries import (
     add_processing_session,
@@ -41,7 +42,8 @@ from .processing_queries import (
     add_processing_input,
     get_processing_inputs_for_session,
     add_processing_output,
-    get_processing_outputs_for_session
+    get_processing_outputs_for_session,
+    get_processing_sessions_for_batch
 )
 from .utils import (
     init_database,
@@ -69,6 +71,7 @@ __all__ = [
     'get_product_by_id',
     'update_product',
     'delete_product',
+    'get_product_counts_by_animal_type',
     'add_batch',
     'get_all_batches',
     'get_batch_by_id',
@@ -77,6 +80,7 @@ __all__ = [
     'delete_batch',
     'get_expired_batches',
     'get_soon_to_expire_batches',
+    'get_inventory_over_time',
     'add_processing_session',
     'get_all_processing_sessions',
     'get_processing_session_by_id',
@@ -84,6 +88,7 @@ __all__ = [
     'get_processing_inputs_for_session',
     'add_processing_output',
     'get_processing_outputs_for_session',
+    'get_processing_sessions_for_batch',
     'init_database',
     'test_connection',
     'backup_database',
