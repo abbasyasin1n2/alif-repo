@@ -4,30 +4,30 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="row" style="margin-top: 50px;">
-    <div class="col s12 m8 l4 offset-m2 offset-l4">
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title center-align">Login</span>
-                <form method="POST">
-                    <div class="input-field">
-                        <i class="material-icons prefix">account_circle</i>
-                        <input id="username" type="text" name="username" class="validate" required>
-                        <label for="username">Username</label>
-                    </div>
-                    <div class="input-field">
-                        <i class="material-icons prefix">lock</i>
-                        <input id="password" type="password" name="password" class="validate" required>
-                        <label for="password">Password</label>
-                    </div>
-                    <div class="center-align">
-                        <button type="submit" class="btn waves-effect waves-light">
-                            Login <i class="material-icons right">send</i>
-                        </button>
-                    </div>
-                </form>
+<div class="auth-wrapper">
+    <div class="auth-card animate__animated animate__fadeInUp">
+        <div class="card-panel-new">
+            <div class="card-title-with-button center-align">
+                <h4>Login</h4>
             </div>
-            <div class="card-action center-align">
+            <form method="POST">
+                <div class="input-field">
+                    <i class="ti ti-user prefix"></i>
+                    <input id="username" type="text" name="username" class="validate" required>
+                    <label for="username">Username</label>
+                </div>
+                <div class="input-field">
+                    <i class="ti ti-lock prefix"></i>
+                    <input id="password" type="password" name="password" class="validate" required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="center-align" style="margin-top: 20px;">
+                    <button type="submit" class="btn waves-effect waves-light action-btn">
+                        Login <i class="ti ti-arrow-right right"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="center-align" style="margin-top: 20px;">
                 <a href="{{ url_for('auth.register') }}">Don't have an account? Register here.</a>
             </div>
         </div>

@@ -5,113 +5,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Meat Inventory Management{% endblock %}</title>
-    <!--Import Google Icon Font-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!--Import materialize.css-->
+    
+    <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
-    <header>
-        <nav class="teal darken-2">
-            <div class="nav-wrapper container">
-                <a href="{{ url_for('main.index') }}" class="brand-logo">
-                    <i class="material-icons">store</i> Meat Inventory
+
+    <div class="sidebar">
+        <div class="logo-details">
+            <i class="ti ti-meat icon"></i>
+            <div class="logo_name">Minventory</div>
+            <i class="ti ti-menu-2" id="sidebar-toggle"></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <a href="{{ url_for('main.dashboard') }}">
+                    <i class="ti ti-layout-dashboard"></i>
+                    <span class="links_name">Dashboard</span>
                 </a>
-                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                    {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-                    <li><a class="dropdown-trigger" href="#!" data-target="inventory-dropdown">Inventory<i class="material-icons right">arrow_drop_down</i></a></li>
-                    <li><a href="{{ url_for('processing.list_sessions') }}">Processing</a></li>
-                    <li><a href="{{ url_for('traceability.traceability_report') }}">Traceability</a></li>
-                    <li><a class="dropdown-trigger" href="#!" data-target="user-dropdown">{{ current_user.username }}<i class="material-icons right">arrow_drop_down</i></a></li>
-                    {% else %}
-                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
-                    {% endif %}
+                <span class="tooltip">Dashboard</span>
+            </li>
+            <li class="submenu-trigger">
+                <a>
+                    <i class="ti ti-packages"></i>
+                    <span class="links_name">Inventory</span>
+                    <i class="ti ti-chevron-down arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
+                    <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
+                    <li><a href="{{ url_for('inventory.list_batches') }}">Batches</a></li>
                 </ul>
-            </div>
-        </nav>
-        
-        <ul id="inventory-dropdown" class="dropdown-content">
-            <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
-            <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
-            <li class="divider"></li>
-            <li><a href="{{ url_for('inventory.list_batches') }}">Batches</a></li>
+                <span class="tooltip">Inventory</span>
+            </li>
+            <li>
+                <a href="{{ url_for('processing.list_sessions') }}">
+                    <i class="ti ti-settings-cog"></i>
+                    <span class="links_name">Processing</span>
+                </a>
+                <span class="tooltip">Processing</span>
+            </li>
+            <li>
+                <a href="{{ url_for('traceability.traceability_report') }}">
+                    <i class="ti ti-route-2"></i>
+                    <span class="links_name">Traceability</span>
+                </a>
+                <span class="tooltip">Traceability</span>
+            </li>
+            <li class="profile">
+                <div class="profile-details">
+                    <div class="name_job">
+                        <div class="name">{{ current_user.username }}</div>
+                        <div class="job">Admin</div>
+                    </div>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" id="log_out">
+                    <i class="ti ti-logout"></i>
+                </a>
+            </li>
         </ul>
-        
-        <ul id="user-dropdown" class="dropdown-content">
-            <li><a href="#">Profile</a></li>
-            <li class="divider"></li>
-            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
-        </ul>
+    </div>
 
-        <ul class="sidenav" id="mobile-nav">
-            <li><a href="{{ url_for('main.index') }}">Home</a></li>
-            {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('inventory.list_products') }}">Products</a></li>
-            <li><a href="{{ url_for('inventory.list_suppliers') }}">Suppliers</a></li>
-            <li><a href="{{ url_for('inventory.list_batches') }}">Batches</a></li>
-            <li><a href="{{ url_for('processing.list_sessions') }}">Processing</a></li>
-            <li><a href="{{ url_for('traceability.traceability_report') }}">Traceability</a></li>
-            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
-            {% else %}
-            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
-            {% endif %}
-        </ul>
-    </header>
-
-    <main>
-        <div class="container">
+    <section class="main-content">
+        <div class="container-fluid">
             {% block content %}{% endblock %}
         </div>
-    </main>
+    </section>
 
-    <footer class="page-footer">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="white-text">Meat Inventory Management</h5>
-                    <p class="grey-text text-lighten-4">A CSE303 Database Management Project.</p>
-                </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="white-text">Links</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="{{ url_for('main.index') }}">Home</a></li>
-                        {% if current_user.is_authenticated %}
-                        <li><a class="grey-text text-lighten-3" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-                        {% else %}
-                        <li><a class="grey-text text-lighten-3" href="{{ url_for('auth.login') }}">Login</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                © 2024 All Rights Reserved
-                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
-            </div>
-        </div>
-    </footer>
-
-    <!--JavaScript at end of body for optimized loading-->
+    <!-- Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var elems = document.querySelectorAll('.sidenav');
-            M.Sidenav.init(elems);
-            var dropdowns = document.querySelectorAll('.dropdown-trigger');
-            M.Dropdown.init(dropdowns);
-
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -126,8 +102,16 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+
+            var elems = document.querySelectorAll('.submenu-trigger');
+            elems.forEach(function(elem) {
+                elem.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
         });
     </script>
     {% block extra_js %}{% endblock %}
+
 </body>
 </html>

@@ -4,51 +4,45 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2 class="header">Dashboard</h2>
-<p class="flow-text">Welcome, {{ current_user.username }}!</p>
+<div class="animate__animated animate__fadeIn">
+    <h2 class="header">Dashboard</h2>
+    <p class="flow-text">Welcome, {{ current_user.username }}!</p>
+</div>
 
 <div class="row">
     <div class="col s12 m6 l3">
-        <div class="card">
+        <div class="summary-card animate__animated animate__fadeInUp">
+            <div class="card-icon"><i class="ti ti-users"></i></div>
             <div class="card-content">
-                <span class="card-title">Users</span>
-                <h3 class="center-align">{{ stats.total_users or 0 }}</h3>
-            </div>
-            <div class="card-action">
-                <a href="#">View Users</a>
+                <p class="category">Total Users</p>
+                <h4 class="title">{{ stats.total_users or 0 }}</h4>
             </div>
         </div>
     </div>
     <div class="col s12 m6 l3">
-        <div class="card">
+        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="card-icon"><i class="ti ti-box"></i></div>
             <div class="card-content">
-                <span class="card-title">Products</span>
-                <h3 class="center-align">{{ stats.total_products or 0 }}</h3>
-            </div>
-            <div class="card-action">
-                <a href="{{ url_for('inventory.list_products') }}">View Products</a>
+                <p class="category">Total Products</p>
+                <h4 class="title">{{ stats.total_products or 0 }}</h4>
             </div>
         </div>
     </div>
     <div class="col s12 m6 l3">
-        <div class="card">
+        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="card-icon"><i class="ti ti-truck-delivery"></i></div>
             <div class="card-content">
-                <span class="card-title">Suppliers</span>
-                <h3 class="center-align">{{ stats.total_suppliers or 0 }}</h3>
-            </div>
-            <div class="card-action">
-                <a href="{{ url_for('inventory.list_suppliers') }}">View Suppliers</a>
+                <p class="category">Total Suppliers</p>
+                <h4 class="title">{{ stats.total_suppliers or 0 }}</h4>
             </div>
         </div>
     </div>
     <div class="col s12 m6 l3">
-        <div class="card">
+        <div class="summary-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+            <div class="card-icon"><i class="ti ti-activity"></i></div>
             <div class="card-content">
-                <span class="card-title">Activity</span>
-                 <h3 class="center-align">0</h3>
-            </div>
-            <div class="card-action">
-                <a href="#">View Activity</a>
+                <p class="category">Recent Activity</p>
+                <h4 class="title">0</h4>
             </div>
         </div>
     </div>
@@ -56,45 +50,39 @@
 
 <div class="row">
     <div class="col s12 m6">
-        <div class="card-panel red lighten-1">
-            <h5 class="white-text"><i class="material-icons left">warning</i>Expired Batches</h5>
+        <div class="card-panel-new red animate__animated animate__fadeInLeft">
+            <h5><i class="ti ti-alert-triangle left"></i>Expired Batches</h5>
+            <div class="collection">
+                {% for batch in expired_batches %}
+                    <a href="#!" class="collection-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }} <span class="right">{{ batch.expiration_date }}</span></a>
+                {% else %}
+                    <a href="#!" class="collection-item">No expired batches.</a>
+                {% endfor %}
+            </div>
         </div>
-        <ul class="collection">
-            {% for batch in expired_batches %}
-                <li class="collection-item">
-                    {{ batch.product_name }} - Batch #{{ batch.batch_number }}
-                    <span class="right">Expired on: {{ batch.expiration_date }}</span>
-                </li>
-            {% else %}
-                <li class="collection-item">No expired batches.</li>
-            {% endfor %}
-        </ul>
     </div>
     <div class="col s12 m6">
-        <div class="card-panel amber lighten-1">
-            <h5 class="black-text"><i class="material-icons left">notification_important</i>Expiring Soon (Next 7 Days)</h5>
+        <div class="card-panel-new orange animate__animated animate__fadeInRight">
+            <h5><i class="ti ti-bell-ringing left"></i>Expiring Soon (7 Days)</h5>
+            <div class="collection">
+                {% for batch in soon_to_expire_batches %}
+                     <a href="#!" class="collection-item">{{ batch.product_name }} - Batch #{{ batch.batch_number }} <span class="right">{{ batch.expiration_date }}</span></a>
+                {% else %}
+                    <a href="#!" class="collection-item">No batches expiring soon.</a>
+                {% endfor %}
+            </div>
         </div>
-        <ul class="collection">
-            {% for batch in soon_to_expire_batches %}
-                <li class="collection-item">
-                    {{ batch.product_name }} - Batch #{{ batch.batch_number }}
-                    <span class="right">Expires on: {{ batch.expiration_date }}</span>
-                </li>
-            {% else %}
-                <li class="collection-item">No batches expiring soon.</li>
-            {% endfor %}
-        </ul>
     </div>
 </div>
-
 
 <div class="row">
     <div class="col s12">
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Quick Actions</span>
-                <a href="{{ url_for('inventory.add_product_route') }}" class="btn-large waves-effect waves-light">Add Product</a>
-                <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn-large waves-effect waves-light">Add Supplier</a>
+        <div class="card-panel-new-actions animate__animated animate__fadeInUp">
+            <span class="card-title">Quick Actions</span>
+            <div class="actions-container">
+                <a href="{{ url_for('inventory.add_product_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Product</a>
+                <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Supplier</a>
+                <a href="{{ url_for('inventory.add_batch_route') }}" class="btn-large waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Batch</a>
             </div>
         </div>
     </div>

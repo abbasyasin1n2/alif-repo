@@ -4,48 +4,53 @@
 {% block title %}Suppliers{% endblock %}
 
 {% block content %}
-<h2 class="header">Suppliers</h2>
-<a href="{{ url_for('inventory.add_supplier_route') }}" class="btn-floating btn-large waves-effect waves-light right">
-    <i class="material-icons">add</i>
-</a>
-
-<table class="striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Contact Person</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Address</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for supplier in suppliers %}
-        <tr>
-            <td>{{ supplier.name }}</td>
-            <td>{{ supplier.contact_person }}</td>
-            <td>{{ supplier.phone }}</td>
-            <td>{{ supplier.email }}</td>
-            <td>{{ supplier.address }}</td>
-            <td>
-                <a href="{{ url_for('inventory.edit_supplier', id=supplier.id) }}" class="btn-small waves-effect waves-light amber">
-                    <i class="material-icons">edit</i>
-                </a>
-                <form id="delete-form-{{ supplier.id }}" action="{{ url_for('inventory.delete_supplier_route', id=supplier.id) }}" method="post" style="display:inline;">
-                    <button type="button" class="btn-small waves-effect waves-light red" onclick="confirmDelete('{{ supplier.id }}')">
-                        <i class="material-icons">delete</i>
-                    </button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6" class="center-align">No suppliers found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="animate__animated animate__fadeIn">
+    <div class="row">
+        <div class="col s12">
+            <div class="card-panel-new">
+                <div class="card-title-with-button">
+                    <h4>Suppliers</h4>
+                    <a href="{{ url_for('inventory.add_supplier_route') }}" class="btn waves-effect waves-light action-btn"><i class="ti ti-plus left"></i>Add Supplier</a>
+                </div>
+                <div class="responsive-table">
+                    <table class="highlight">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for supplier in suppliers %}
+                            <tr>
+                                <td>{{ supplier.name }}</td>
+                                <td>{{ supplier.contact_person }}</td>
+                                <td>{{ supplier.phone }}</td>
+                                <td>{{ supplier.email }}</td>
+                                <td>{{ supplier.address }}</td>
+                                <td>
+                                    <a href="{{ url_for('inventory.edit_supplier', id=supplier.id) }}" class="btn-small waves-effect waves-light amber"><i class="ti ti-edit"></i></a>
+                                    <form id="delete-form-{{ supplier.id }}" action="{{ url_for('inventory.delete_supplier_route', id=supplier.id) }}" method="post" style="display:inline;">
+                                        <button type="button" class="btn-small waves-effect waves-light red" onclick="confirmDelete('{{ supplier.id }}')"><i class="ti ti-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="center-align">No suppliers found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

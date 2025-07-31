@@ -4,14 +4,14 @@
 {% block title %}View Processing Session{% endblock %}
 
 {% block content %}
-<h2 class="header">Session: {{ session.session_name }}</h2>
-<p><strong>Date:</strong> {{ session.session_date }}</p>
-<p><strong>Notes:</strong> {{ session.notes }}</p>
+<div class="animate__animated animate__fadeIn">
+    <h2 class="header">Session: {{ session.session_name }}</h2>
+    <p><strong>Date:</strong> {{ session.session_date }}</p>
+    <p><strong>Notes:</strong> {{ session.notes }}</p>
 
-<div class="row">
-    <div class="col s12">
-        <div class="card">
-            <div class="card-content">
+    <div class="row">
+        <div class="col s12">
+            <div class="card-panel-new">
                 <span class="card-title">Yield Analysis</span>
                 <div class="row">
                     <div class="col s4">
@@ -30,71 +30,72 @@
             </div>
         </div>
     </div>
-</div>
 
-
-<div class="row">
-    <div class="col s6">
-        <h3 class="header">Inputs</h3>
-        <a href="{{ url_for('processing.add_input', id=session.id) }}" class="btn-floating waves-effect waves-light right">
-            <i class="material-icons">add</i>
-        </a>
-        <table class="striped">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Batch Number</th>
-                    <th>Quantity Used (kg)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for input in inputs %}
-                <tr>
-                    <td>{{ input.product_name }}</td>
-                    <td>{{ input.batch_number }}</td>
-                    <td>{{ "%.2f"|format(input.quantity_used) }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" class="center-align">No inputs found for this session.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col s6">
+            <div class="card-panel-new">
+                <div class="card-title-with-button">
+                    <h5>Inputs</h5>
+                    <a href="{{ url_for('processing.add_input', id=session.id) }}" class="btn-floating waves-effect waves-light action-btn"><i class="ti ti-plus"></i></a>
+                </div>
+                <table class="highlight">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Batch Number</th>
+                            <th>Quantity Used (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for input in inputs %}
+                        <tr>
+                            <td>{{ input.product_name }}</td>
+                            <td>{{ input.batch_number }}</td>
+                            <td>{{ "%.2f"|format(input.quantity_used) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="center-align">No inputs found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card-panel-new">
+                <div class="card-title-with-button">
+                    <h5>Outputs</h5>
+                    <a href="{{ url_for('processing.add_output', id=session.id) }}" class="btn-floating waves-effect waves-light action-btn {% if not inputs %}disabled{% endif %}"><i class="ti ti-plus"></i></a>
+                </div>
+                <table class="highlight">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Output Type</th>
+                            <th>Weight (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for output in outputs %}
+                        <tr>
+                            <td>{{ output.product_name }}</td>
+                            <td>{{ output.output_type }}</td>
+                            <td>{{ "%.2f"|format(output.weight) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="center-align">No outputs found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="col s6">
-        <h3 class="header">Outputs</h3>
-        <a href="{{ url_for('processing.add_output', id=session.id) }}" class="btn-floating waves-effect waves-light right {% if not inputs %}disabled{% endif %}">
-            <i class="material-icons">add</i>
-        </a>
-        <table class="striped">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Output Type</th>
-                    <th>Weight (kg)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for output in outputs %}
-                <tr>
-                    <td>{{ output.product_name }}</td>
-                    <td>{{ output.output_type }}</td>
-                    <td>{{ "%.2f"|format(output.weight) }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" class="center-align">No outputs found for this session.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 
-<div class="fixed-action-btn">
-    <a href="{{ url_for('processing.list_sessions') }}" class="btn-floating btn-large grey">
-        <i class="large material-icons">arrow_back</i>
-    </a>
+    <div class="fixed-action-btn">
+        <a href="{{ url_for('processing.list_sessions') }}" class="btn-floating btn-large grey"><i class="ti ti-arrow-left"></i></a>
+    </div>
 </div>
 {% endblock %}
