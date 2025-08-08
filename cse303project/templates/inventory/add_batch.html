@@ -51,7 +51,7 @@
                     <div class="row">
                         <div class="input-field col s12">
                              <i class="ti ti-map-pin prefix"></i>
-                            <input id="storage_location" type="text" name="storage_location">
+                            <select id="storage_location" name="storage_location"><option value="" disabled selected>Choose storage location</option>{% for storage in storage_locations %}<option value="{{ storage.id }}">{{ storage.name }} ({{ storage.location_type }})</option>{% endfor %}</select>
                             <label for="storage_location">Storage Location</label>
                         </div>
                     </div>

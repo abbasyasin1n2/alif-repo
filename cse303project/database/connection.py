@@ -3,7 +3,9 @@ import os
 import mysql.connector
 from mysql.connector import Error
 import sqlite3
-from ..config.config import Config
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.config import Config
 
 DB_TYPE = Config.DB_TYPE
 DATABASE = Config.SQLITE_DATABASE

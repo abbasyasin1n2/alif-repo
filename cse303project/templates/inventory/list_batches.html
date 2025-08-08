@@ -22,6 +22,7 @@
                                 <th>Arrival Date</th>
                                 <th>Expiration Date</th>
                                 <th>Storage Location</th>
+                                <th>Compliance</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -35,15 +36,27 @@
                                 <td>{{ batch.expiration_date }}</td>
                                 <td>{{ batch.storage_location }}</td>
                                 <td>
-                                    <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light btn-edit"><i class="ti ti-edit"></i></a>
-                                    <form id="delete-form-{{ batch.id }}" action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" style="display:inline;">
-                                        <button type="button" class="btn-small waves-effect waves-light btn-warning" onclick="confirmDelete('{{ batch.id }}')"><i class="ti ti-trash"></i></button>
+                                    {% if batch.compliance.status == 'normal' %}
+                                        <span class="badge green compliance-badge">Normal</span>
+                                    {% elif batch.compliance.status == 'warning' %}
+                                        <span class="badge orange compliance-badge">Warning</span>
+                                    {% elif batch.compliance.status == 'critical' %}
+                                        <span class="badge red compliance-badge">Critical</span>
+                                    {% else %}
+                                        <span class="badge grey compliance-badge">Unknown</span>
+                                    {% endif %}
+                                    <br><small><a href="#" onclick="loadBatchCompliance({{ batch.id }})" class="blue-text" title="View compliance details">View Details</a></small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('inventory.edit_batch', id=batch.id) }}" class="btn-small waves-effect waves-light btn-edit" title="Edit batch"><i class="ti ti-edit"></i></a>
+                                    <form id="delete-form-{{ batch.id }}" action="{{ url_for('inventory.delete_batch_route', id=batch.id) }}" method="post" class="inline-form">
+                                        <button type="button" class="btn-small waves-effect waves-light btn-warning" onclick="confirmDelete('{{ batch.id }}')" title="Delete batch"><i class="ti ti-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="7" class="center-align">No inventory batches found.</td>
+                                <td colspan="8" class="center-align">No inventory batches found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -53,10 +66,43 @@
         </div>
     </div>
 </div>
+
+<!-- Compliance Details Modal -->
+<div id="complianceModal" class="modal">
+    <div class="modal-content">
+        <h4>Batch Compliance Details</h4>
+        <div id="complianceContent">
+            <div class="center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>Loading compliance details...</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize modal
+        M.Modal.init(document.querySelectorAll('.modal'));
+    });
+
     function confirmDelete(id) {
         Swal.fire({
             title: 'Are you sure?',
@@ -71,6 +117,91 @@
                 document.getElementById('delete-form-' + id).submit();
             }
         })
+    }
+
+    function loadBatchCompliance(batchId) {
+        // Open modal
+        const modal = M.Modal.getInstance(document.getElementById('complianceModal'));
+        modal.open();
+        
+        // Reset content to loading state
+        document.getElementById('complianceContent').innerHTML = `
+            <div class="center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>Loading compliance details...</p>
+            </div>
+        `;
+        
+        // Fetch compliance data
+        fetch(`{{ url_for('inventory.get_batch_compliance_api', batch_id=0) }}`.replace('0', batchId))
+            .then(response => response.json())
+            .then(data => {
+                let statusClass = 'green';
+                let statusText = 'Normal';
+                
+                if (data.status === 'warning') {
+                    statusClass = 'orange';
+                    statusText = 'Warning';
+                } else if (data.status === 'critical') {
+                    statusClass = 'red';
+                    statusText = 'Critical';
+                } else if (data.status === 'unknown') {
+                    statusClass = 'grey';
+                    statusText = 'Unknown';
+                }
+                
+                let issuesHtml = '';
+                if (data.issues && data.issues.length > 0) {
+                    issuesHtml = `
+                        <h6>Issues Found:</h6>
+                        <ul class="collection">
+                            ${data.issues.map(issue => `<li class="collection-item">${issue}</li>`).join('')}
+                        </ul>
+                    `;
+                } else {
+                    issuesHtml = '<p><i class="ti ti-check green-text"></i> No compliance issues found.</p>';
+                }
+                
+                document.getElementById('complianceContent').innerHTML = `
+                    <div class="row">
+                        <div class="col s12">
+                            <h6>Compliance Status:</h6>
+                            <span class="badge ${statusClass} compliance-badge">${statusText}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            ${issuesHtml}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <p><small><strong>Batch ID:</strong> ${data.batch_id}</small></p>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error loading compliance data:', error);
+                document.getElementById('complianceContent').innerHTML = `
+                    <div class="center-align">
+                        <i class="ti ti-alert-triangle red-text" style="font-size: 48px;"></i>
+                        <p>Error loading compliance details. Please try again.</p>
+                    </div>
+                `;
+            });
     }
 </script>
 {% endblock %}

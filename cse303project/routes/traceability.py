@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 import json
-from ..database import (
+from database import (
+    get_storage_location_by_id,
     get_batch_by_id,
     get_processing_outputs_for_session,
     get_product_by_id,
@@ -20,6 +21,7 @@ def traceability_report():
     batch = None
     product = None
     supplier = None
+    storage_location = None
     usage_details = []
 
     if selected_batch_id:
@@ -28,6 +30,8 @@ def traceability_report():
             product = get_product_by_id(batch['product_id'])
             if product and product['supplier_id']:
                 supplier = get_supplier_by_id(product['supplier_id'])
+            
+            # Storage location information is now included in the batch data
             
             # Use the new efficient query
             sessions = get_processing_sessions_for_batch(selected_batch_id)
@@ -53,5 +57,6 @@ def traceability_report():
         batch=batch,
         product=product,
         supplier=supplier,
+        storage_location=batch,
         usage_details=usage_details
     )

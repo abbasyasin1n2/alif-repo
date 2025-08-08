@@ -2,7 +2,10 @@
 from .connection import get_db_connection, DB_TYPE
 from .user_queries import execute_query
 from datetime import datetime
-from ..config.config import Config
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.config import Config
 
 def init_database():
     """Initialize the database with all required tables"""
@@ -120,6 +123,176 @@ def init_database():
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''')
 
+            # Storage tables for MySQL
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS storage_locations (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL,
+                    description TEXT,
+                    location_type VARCHAR(50),
+                    capacity DECIMAL(10, 2),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS storage_sensors (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    storage_id INT NOT NULL,
+                    sensor_type VARCHAR(50) NOT NULL,
+                    sensor_id VARCHAR(100) NOT NULL,
+                    status VARCHAR(20) DEFAULT 'active',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (storage_id) REFERENCES storage_locations(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sensor_readings (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    sensor_id INT NOT NULL,
+                    temperature DECIMAL(5, 2),
+                    humidity DECIMAL(5, 2),
+                    alert_status VARCHAR(20) DEFAULT 'normal',
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (sensor_id) REFERENCES storage_sensors(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            # Compliance and Regulatory Tables
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS compliance_records (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    record_type VARCHAR(50) NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    certificate_number VARCHAR(100),
+                    issuing_authority VARCHAR(255),
+                    issue_date DATE,
+                    expiration_date DATE,
+                    status VARCHAR(20) DEFAULT 'active',
+                    file_path VARCHAR(500),
+                    created_by INT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (created_by) REFERENCES users(id),
+                    INDEX idx_record_type (record_type),
+                    INDEX idx_expiration_date (expiration_date),
+                    INDEX idx_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS batch_recalls (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    recall_number VARCHAR(50) UNIQUE NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    reason TEXT NOT NULL,
+                    severity_level VARCHAR(20) NOT NULL,
+                    status VARCHAR(20) DEFAULT 'initiated',
+                    initiated_by INT NOT NULL,
+                    initiated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    completed_date TIMESTAMP NULL,
+                    customer_notification_sent BOOLEAN DEFAULT FALSE,
+                    regulatory_notification_sent BOOLEAN DEFAULT FALSE,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (initiated_by) REFERENCES users(id),
+                    INDEX idx_recall_number (recall_number),
+                    INDEX idx_severity_level (severity_level),
+                    INDEX idx_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS recall_batches (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    recall_id INT NOT NULL,
+                    batch_id INT NOT NULL,
+                    quantity_affected DECIMAL(10, 2),
+                    recovery_status VARCHAR(20) DEFAULT 'pending',
+                    recovery_date TIMESTAMP NULL,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (recall_id) REFERENCES batch_recalls(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id),
+                    UNIQUE KEY unique_recall_batch (recall_id, batch_id),
+                    INDEX idx_recall_id (recall_id),
+                    INDEX idx_batch_id (batch_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS food_safety_incidents (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    incident_number VARCHAR(50) UNIQUE NOT NULL,
+                    incident_type VARCHAR(50) NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT NOT NULL,
+                    severity_level VARCHAR(20) NOT NULL,
+                    status VARCHAR(20) DEFAULT 'open',
+                    reported_by INT NOT NULL,
+                    reported_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    investigation_notes TEXT,
+                    corrective_actions TEXT,
+                    root_cause TEXT,
+                    closed_date TIMESTAMP NULL,
+                    closed_by INT NULL,
+                    regulatory_reported BOOLEAN DEFAULT FALSE,
+                    regulatory_report_date TIMESTAMP NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (reported_by) REFERENCES users(id),
+                    FOREIGN KEY (closed_by) REFERENCES users(id),
+                    INDEX idx_incident_number (incident_number),
+                    INDEX idx_incident_type (incident_type),
+                    INDEX idx_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS incident_batches (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    incident_id INT NOT NULL,
+                    batch_id INT NOT NULL,
+                    involvement_level VARCHAR(50) NOT NULL,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (incident_id) REFERENCES food_safety_incidents(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id),
+                    UNIQUE KEY unique_incident_batch (incident_id, batch_id),
+                    INDEX idx_incident_id (incident_id),
+                    INDEX idx_batch_id (batch_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS compliance_audits (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    audit_type VARCHAR(50) NOT NULL,
+                    auditor_name VARCHAR(255) NOT NULL,
+                    audit_date DATE NOT NULL,
+                    scope TEXT,
+                    findings TEXT,
+                    recommendations TEXT,
+                    overall_rating VARCHAR(20),
+                    status VARCHAR(20) DEFAULT 'completed',
+                    follow_up_required BOOLEAN DEFAULT FALSE,
+                    follow_up_date DATE NULL,
+                    report_file_path VARCHAR(500),
+                    conducted_by INT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (conducted_by) REFERENCES users(id),
+                    INDEX idx_audit_type (audit_type),
+                    INDEX idx_audit_date (audit_date),
+                    INDEX idx_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''')
+
         else:
             # SQLite table creation
             cursor.execute('''
@@ -223,6 +396,160 @@ def init_database():
                     ip_address TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            ''')
+
+            # Storage tables
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS storage_locations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    location_type TEXT,
+                    capacity REAL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS storage_sensors (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    storage_id INTEGER NOT NULL,
+                    sensor_type TEXT NOT NULL,
+                    sensor_id TEXT NOT NULL,
+                    status TEXT DEFAULT 'active',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (storage_id) REFERENCES storage_locations(id) ON DELETE CASCADE
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sensor_readings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    sensor_id INTEGER NOT NULL,
+                    temperature REAL,
+                    humidity REAL,
+                    alert_status TEXT DEFAULT 'normal',
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (sensor_id) REFERENCES storage_sensors(id) ON DELETE CASCADE
+                )
+            ''')
+
+            # Compliance and Regulatory Tables
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS compliance_records (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    record_type TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    description TEXT,
+                    certificate_number TEXT,
+                    issuing_authority TEXT,
+                    issue_date DATE,
+                    expiration_date DATE,
+                    status TEXT DEFAULT 'active',
+                    file_path TEXT,
+                    created_by INTEGER NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (created_by) REFERENCES users(id)
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS batch_recalls (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    recall_number TEXT UNIQUE NOT NULL,
+                    title TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    severity_level TEXT NOT NULL,
+                    status TEXT DEFAULT 'initiated',
+                    initiated_by INTEGER NOT NULL,
+                    initiated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    completed_date TIMESTAMP NULL,
+                    customer_notification_sent BOOLEAN DEFAULT FALSE,
+                    regulatory_notification_sent BOOLEAN DEFAULT FALSE,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (initiated_by) REFERENCES users(id)
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS recall_batches (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    recall_id INTEGER NOT NULL,
+                    batch_id INTEGER NOT NULL,
+                    quantity_affected REAL,
+                    recovery_status TEXT DEFAULT 'pending',
+                    recovery_date TIMESTAMP NULL,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (recall_id) REFERENCES batch_recalls(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id),
+                    UNIQUE(recall_id, batch_id)
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS food_safety_incidents (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    incident_number TEXT UNIQUE NOT NULL,
+                    incident_type TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    severity_level TEXT NOT NULL,
+                    status TEXT DEFAULT 'open',
+                    reported_by INTEGER NOT NULL,
+                    reported_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    investigation_notes TEXT,
+                    corrective_actions TEXT,
+                    root_cause TEXT,
+                    closed_date TIMESTAMP NULL,
+                    closed_by INTEGER NULL,
+                    regulatory_reported BOOLEAN DEFAULT FALSE,
+                    regulatory_report_date TIMESTAMP NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (reported_by) REFERENCES users(id),
+                    FOREIGN KEY (closed_by) REFERENCES users(id)
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS incident_batches (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    incident_id INTEGER NOT NULL,
+                    batch_id INTEGER NOT NULL,
+                    involvement_level TEXT NOT NULL,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (incident_id) REFERENCES food_safety_incidents(id) ON DELETE CASCADE,
+                    FOREIGN KEY (batch_id) REFERENCES inventory_batches(id),
+                    UNIQUE(incident_id, batch_id)
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS compliance_audits (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    audit_type TEXT NOT NULL,
+                    auditor_name TEXT NOT NULL,
+                    audit_date DATE NOT NULL,
+                    scope TEXT,
+                    findings TEXT,
+                    recommendations TEXT,
+                    overall_rating TEXT,
+                    status TEXT DEFAULT 'completed',
+                    follow_up_required BOOLEAN DEFAULT FALSE,
+                    follow_up_date DATE NULL,
+                    report_file_path TEXT,
+                    conducted_by INTEGER NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (conducted_by) REFERENCES users(id)
                 )
             ''')
 

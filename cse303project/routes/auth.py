@@ -2,8 +2,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 import hashlib
-from ..database import get_user_by_username, create_user, log_activity
-from ..models import User
+from database import get_user_by_username, create_user, log_activity
+from models import User
 
 auth_bp = Blueprint('auth', __name__, template_folder='templates')
 

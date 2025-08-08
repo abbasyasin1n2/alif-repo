@@ -39,17 +39,17 @@
             <h5><i class="ti ti-box-seam" style="margin-right: 10px;"></i>Batch #{{ batch.batch_number }} Details</h5>
         </div>
         <div class="row">
-            <div class="col s12 m6 l4">
+            <div class="col s12 m6 l3">
                 <h6>Product Information</h6>
                 <p><strong>Name:</strong> {{ product.name }}</p>
                 <p><strong>Animal/Cut:</strong> {{ product.animal_type }} / {{ product.cut_type }}</p>
             </div>
-            <div class="col s12 m6 l4">
+            <div class="col s12 m6 l3">
                 <h6>Batch Information</h6>
                 <p><strong>Arrival Date:</strong> {{ batch.arrival_date }}</p>
                 <p><strong>Expiration Date:</strong> {{ batch.expiration_date }}</p>
             </div>
-            <div class="col s12 m6 l4">
+            <div class="col s12 m6 l3">
                 <h6><i class="ti ti-truck-delivery" style="margin-right: 10px;"></i>Supplier</h6>
                 {% if supplier %}
                 <p><strong>Name:</strong> {{ supplier.name }}</p>
@@ -57,6 +57,56 @@
                 {% else %}
                 <p>No supplier information available.</p>
                 {% endif %}
+            </div>
+            <div class="col s12 m6 l3">
+                <h6><i class="ti ti-building-warehouse" style="margin-right: 10px;"></i>Storage Location</h6>
+                {% if batch.storage_name %}
+                <p><strong>Name:</strong> {{ batch.storage_name }}</p>
+                <p><strong>Type:</strong> {{ batch.storage_type }}</p>
+                <p><strong>Capacity:</strong> {{ batch.storage_capacity or "N/A" }} kg</p>
+                {% else %}
+                <p>No storage information available.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Compliance Actions -->
+        <div class="row" style="margin-top: 20px;">
+            <div class="col s12">
+                <div class="card-title-with-button">
+                    <h6><i class="ti ti-shield-check" style="margin-right: 10px;"></i>Compliance Actions</h6>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <a href="{{ url_for('compliance.initiate_batch_recall') }}?batch_id={{ batch.id }}" 
+                       class="btn waves-effect waves-light red" 
+                       onclick="return confirm('Are you sure you want to initiate a recall for this batch?')">
+                        <i class="ti ti-ban left"></i>Initiate Recall
+                    </a>
+                    <a href="{{ url_for('compliance.add_food_safety_incident_route') }}?batch_id={{ batch.id }}" 
+                       class="btn waves-effect waves-light orange">
+                        <i class="ti ti-alert-triangle left"></i>Report Safety Incident
+                    </a>
+                    <button class="btn waves-effect waves-light blue" onclick="loadRecallHistory({{ batch.id }})">
+                        <i class="ti ti-history left"></i>View Recall History
+                    </button>
+                </div>
+                
+                <!-- Recall History Container -->
+                <div id="recallHistoryContainer" style="display: none;">
+                    <h6>Recall History</h6>
+                    <div id="recallHistoryContent">
+                        <div class="center-align" style="padding: 20px;">
+                            <div class="preloader-wrapper small active">
+                                <div class="spinner-layer spinner-blue-only">
+                                    <div class="circle-clipper left"><div class="circle"></div></div>
+                                    <div class="gap-patch"><div class="circle"></div></div>
+                                    <div class="circle-clipper right"><div class="circle"></div></div>
+                                </div>
+                            </div>
+                            <p>Loading recall history...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -158,5 +208,54 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endfor %}
     {% endif %}
 });
+
+// Compliance integration functions
+function loadRecallHistory(batchId) {
+    const container = document.getElementById('recallHistoryContainer');
+    const content = document.getElementById('recallHistoryContent');
+    
+    // Show container and loading state
+    container.style.display = 'block';
+    content.innerHTML = `
+        <div class="center-align" style="padding: 20px;">
+            <div class="preloader-wrapper small active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left"><div class="circle"></div></div>
+                    <div class="gap-patch"><div class="circle"></div></div>
+                    <div class="circle-clipper right"><div class="circle"></div></div>
+                </div>
+            </div>
+            <p>Loading recall history...</p>
+        </div>
+    `;
+    
+    fetch(`/compliance/api/batch/${batchId}/recall_history`)
+        .then(response => response.json())
+        .then(history => {
+            if (history.length === 0) {
+                content.innerHTML = '<p class="center-align">No recall history found for this batch.</p>';
+            } else {
+                let html = '<div class="responsive-table"><table class="highlight"><thead><tr>';
+                html += '<th>Recall Number</th><th>Title</th><th>Status</th><th>Initiated Date</th><th>Recovery Status</th></tr></thead><tbody>';
+                
+                history.forEach(recall => {
+                    html += `<tr>
+                        <td><strong>${recall.recall_number}</strong></td>
+                        <td>${recall.title}</td>
+                        <td><span class="badge recall-status-${recall.status}">${recall.status}</span></td>
+                        <td>${new Date(recall.initiated_date).toLocaleDateString()}</td>
+                        <td><span class="badge ${recall.recovery_status === 'recovered' ? 'green' : 'orange'}">${recall.recovery_status}</span></td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table></div>';
+                content.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading recall history:', error);
+            content.innerHTML = '<p class="center-align red-text">Error loading recall history.</p>';
+        });
+}
 </script>
 {% endblock %}

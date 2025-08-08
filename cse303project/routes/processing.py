@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from decimal import Decimal
-from ..database import (
+from database import (
     get_all_processing_sessions, get_processing_session_by_id, add_processing_session,
     get_processing_inputs_for_session, add_processing_input,
     get_processing_outputs_for_session, add_processing_output,

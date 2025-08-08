@@ -33,7 +33,8 @@ from .batch_queries import (
     delete_batch,
     get_expired_batches,
     get_soon_to_expire_batches,
-    get_inventory_over_time
+    get_inventory_over_time,
+    get_batch_compliance_status
 )
 from .processing_queries import (
     add_processing_session,
@@ -44,6 +45,22 @@ from .processing_queries import (
     add_processing_output,
     get_processing_outputs_for_session,
     get_processing_sessions_for_batch
+)
+from .storage_queries import (
+    add_storage_location,
+    get_all_storage_locations,
+    get_storage_location_by_id,
+    update_storage_location,
+    delete_storage_location,
+    add_storage_sensor,
+    get_sensors_for_storage,
+    update_sensor_status,
+    delete_sensor,
+    add_sensor_reading,
+    get_latest_readings_for_storage,
+    get_readings_history,
+    get_alert_readings,
+    get_storage_stats
 )
 from .utils import (
     init_database,
@@ -80,6 +97,7 @@ __all__ = [
     'delete_batch',
     'get_expired_batches',
     'get_soon_to_expire_batches',
+    'get_batch_compliance_status',
     'get_inventory_over_time',
     'add_processing_session',
     'get_all_processing_sessions',
@@ -89,6 +107,20 @@ __all__ = [
     'add_processing_output',
     'get_processing_outputs_for_session',
     'get_processing_sessions_for_batch',
+    'add_storage_location',
+    'get_all_storage_locations',
+    'get_storage_location_by_id',
+    'update_storage_location',
+    'delete_storage_location',
+    'add_storage_sensor',
+    'get_sensors_for_storage',
+    'update_sensor_status',
+    'delete_sensor',
+    'add_sensor_reading',
+    'get_latest_readings_for_storage',
+    'get_readings_history',
+    'get_alert_readings',
+    'get_storage_stats',
     'init_database',
     'test_connection',
     'backup_database',

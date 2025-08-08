@@ -60,6 +60,20 @@
                 </a>
                 <span class="tooltip">Traceability</span>
             </li>
+            <li>
+                <a href="{{ url_for('storage.list_storage') }}">
+                    <i class="ti ti-building-warehouse"></i>
+                    <span class="links_name">Storage</span>
+                </a>
+                <span class="tooltip">Storage</span>
+            </li>
+            <li>
+                <a href="{{ url_for('compliance.dashboard') }}">
+                    <i class="ti ti-shield-check"></i>
+                    <span class="links_name">Compliance</span>
+                </a>
+                <span class="tooltip">Compliance</span>
+            </li>
             <li class="profile">
                 <div class="profile-details">
                     <div class="name_job">
@@ -67,7 +81,7 @@
                         <div class="job">Admin</div>
                     </div>
                 </div>
-                <a href="{{ url_for('auth.logout') }}" id="log_out">
+                <a href="{{ url_for('auth.logout') }}" id="log_out" title="Logout">
                     <i class="ti ti-logout"></i>
                 </a>
             </li>

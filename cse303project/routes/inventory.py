@@ -1,10 +1,12 @@
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required
-from ..database import (
+from database import (
+    get_all_storage_locations,
     get_all_suppliers, add_supplier, get_supplier_by_id, update_supplier, delete_supplier,
     get_all_products, add_product, get_product_by_id, update_product, delete_product,
-    get_all_batches, add_batch, get_batch_by_id, update_batch, delete_batch
+    get_all_batches, add_batch, get_batch_by_id, update_batch, delete_batch,
+    get_batch_compliance_status
 )
 
 inventory_bp = Blueprint('inventory', __name__, template_folder='templates')
@@ -110,6 +112,11 @@ def delete_product_route(id):
 @login_required
 def list_batches():
     batches = get_all_batches()
+    
+    # Add compliance information to each batch
+    for batch in batches:
+        batch['compliance'] = get_batch_compliance_status(batch['id'])
+    
     return render_template('inventory/list_batches.html', batches=batches)
 
 @inventory_bp.route('/batches/add', methods=['GET', 'POST'])
@@ -127,7 +134,8 @@ def add_batch_route():
         return redirect(url_for('inventory.list_batches'))
 
     products = get_all_products()
-    return render_template('inventory/add_batch.html', products=products)
+    storage_locations = get_all_storage_locations()
+    return render_template('inventory/add_batch.html', products=products, storage_locations=storage_locations)
 
 @inventory_bp.route('/batches/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -145,7 +153,8 @@ def edit_batch(id):
         return redirect(url_for('inventory.list_batches'))
 
     products = get_all_products()
-    return render_template('inventory/edit_batch.html', batch=batch, products=products)
+    storage_locations = get_all_storage_locations()
+    return render_template('inventory/edit_batch.html', batch=batch, products=products, storage_locations=storage_locations)
 
 @inventory_bp.route('/batches/delete/<int:id>', methods=['POST'])
 @login_required
@@ -153,3 +162,11 @@ def delete_batch_route(id):
     delete_batch(id)
     flash('Batch deleted successfully!', 'success')
     return redirect(url_for('inventory.list_batches'))
+
+# API Routes
+@inventory_bp.route('/api/batch/<int:batch_id>/compliance')
+@login_required
+def get_batch_compliance_api(batch_id):
+    """API endpoint to get detailed compliance information for a batch"""
+    compliance = get_batch_compliance_status(batch_id)
+    return jsonify(compliance)

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Food Safety Incident Details{% endblock %}
+
+{% block content %}
+<div class="animate__animated animate__fadeIn">
+    <div class="row">
+        <div class="col s12">
+            <div class="content-card">
+                <div class="card-title-with-button">
+                    <h4>{{ incident.incident_number }} - {{ incident.title }}</h4>
+                    <a href="{{ url_for('compliance.edit_food_safety_incident', incident_id=incident.id) }}" class="btn waves-effect waves-light">Edit</a>
+                </div>
+                <div class="row">
+                    <div class="col s12 m6">
+                        <h6>Incident Information</h6>
+                        <p><strong>Type:</strong> {{ incident.incident_type | title }}</p>
+                        <p><strong>Severity:</strong> <span class="badge severity-{{ incident.severity_level }}">{{ incident.severity_level | title }}</span></p>
+                        <p><strong>Status:</strong> <span class="badge incident-status-{{ incident.status }}">{{ incident.status | title }}</span></p>
+                        <p><strong>Reported By:</strong> {{ incident.reported_by_name }}</p>
+                        <p><strong>Reported Date:</strong> {{ incident.reported_date.strftime('%Y-%m-%d %H:%M') if incident.reported_date else 'N/A' }}</p>
+                    </div>
+                    <div class="col s12 m6">
+                        <h6>Investigation Status</h6>
+                        <p><strong>Regulatory Reported:</strong> {{ 'Yes' if incident.regulatory_reported else 'No' }}</p>
+                        {% if incident.regulatory_report_date %}
+                        <p><strong>Report Date:</strong> {{ incident.regulatory_report_date.strftime('%Y-%m-%d') }}</p>
+                        {% endif %}
+                        {% if incident.closed_date %}
+                        <p><strong>Closed Date:</strong> {{ incident.closed_date.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Closed By:</strong> {{ incident.closed_by_name or 'N/A' }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <h6>Description</h6>
+                        <p>{{ incident.description }}</p>
+                    </div>
+                </div>
+                {% if incident.investigation_notes %}
+                <div class="row">
+                    <div class="col s12">
+                        <h6>Investigation Notes</h6>
+                        <p>{{ incident.investigation_notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if incident.corrective_actions %}
+                <div class="row">
+                    <div class="col s12">
+                        <h6>Corrective Actions</h6>
+                        <p>{{ incident.corrective_actions }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if incident.root_cause %}
+                <div class="row">
+                    <div class="col s12">
+                        <h6>Root Cause</h6>
+                        <p>{{ incident.root_cause }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if incident_batches %}
+                <div class="row">
+                    <div class="col s12">
+                        <h6>Associated Batches</h6>
+                        <div class="responsive-table">
+                            <table class="highlight">
+                                <thead>
+                                    <tr>
+                                        <th>Batch Number</th>
+                                        <th>Product</th>
+                                        <th>Involvement Level</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for batch in incident_batches %}
+                                    <tr>
+                                        <td>{{ batch.batch_number }}</td>
+                                        <td>{{ batch.product_name }}</td>
+                                        <td>{{ batch.involvement_level | title }}</td>
+                                        <td>{{ batch.notes or 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
